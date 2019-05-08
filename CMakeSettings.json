@@ -1,13 +1,35 @@
-{
+﻿{
   "environments": [
     {
-      "environment": "IS_includes", // this is used for intelliSense
-      // ${env.USERPROFILE} == c:\Users\<userName>
-      // ${env.LOCALAPPDATA} == c:\Users\<userName>\AppData\Local
+      "environment": "IS_includes",
       "INCLUDE": "${env.INCLUDE};${env.USERPROFILE}\\programy\\sklad;${env.LOCALAPPDATA}\\Microsoft\\Linux\\Header Cache\\1.0\\919434520\\usr\\include"
     }
   ],
   "configurations": [
+    {
+      "name": "Oasa-MPI",
+      "generator": "Unix Makefiles",
+      "remoteMachineName": "oasa.asu.cas.cz",
+      "configurationType": "Release",
+      "remoteCMakeListsRoot": "/home/kotek/prg/vs/mhdeal_mpi",
+      "cmakeExecutable": "/home/kotek/prg/CMake/build/install/bin/cmake",
+      "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+      "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+      "remoteBuildRoot": "/home/kotek/prg/vs/mhdeal_mpi/build",
+      "remoteInstallRoot": "/home/kotek/prg/vs/mhdeal_mpi/install",
+      "remoteCopySources": true,
+      "remoteCopySourcesOutputVerbosity": "Normal",
+      "remoteCopySourcesConcurrentCopies": "10",
+      "remoteCopySourcesMethod": "sftp",
+      "remoteCopyBuildOutput": true,
+      "remoteCopySourcesExclusionList": [ ".vs", ".git", "/build" ],
+      "cmakeCommandArgs": "-DDEAL_II_DIR=/home/kotek/prg/dealii/build_mpi/install",
+      "buildCommandArgs": "-j20",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "linux_x64", "IS_includes" ],
+      "intelliSenseMode": "linux-gcc-x64",
+      "variables": []
+    },
     {
       "name": "Oasa-Release",
       "generator": "Unix Makefiles",
@@ -24,13 +46,13 @@
       "remoteCopySourcesConcurrentCopies": "10",
       "remoteCopySourcesMethod": "sftp",
       "remoteCopyBuildOutput": true,
+      "remoteCopySourcesExclusionList": [ ".vs", ".git", "/build" ],
       "cmakeCommandArgs": "-DDEAL_II_DIR=/home/kotek/prg/dealii/build/install",
       "buildCommandArgs": "-j20",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [
-        "linux_x64",
-        "IS_includes"
-      ]
+      "inheritEnvironments": [ "linux_x64", "IS_includes" ],
+      "intelliSenseMode": "linux-gcc-x64",
+      "variables": []
     },
     {
       "name": "Oasa-Debug",
@@ -49,14 +71,13 @@
       "remoteCopySourcesMethod": "sftp",
       "remoteCopyBuildOutput": true,
       "cmakeCommandArgs": "-DDEAL_II_DIR=/home/kotek/prg/dealii/build_debug/install",
+      "remoteCopySourcesExclusionList": [ ".vs", ".git", "/build" ],
       "buildCommandArgs": "-j20",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [
-        "linux_x64",
-        "IS_includes"
-      ]
+      "inheritEnvironments": [ "linux_x64", "IS_includes" ],
+      "intelliSenseMode": "linux-gcc-x64",
+      "variables": []
     },
-
     {
       "name": "WSL-Debug",
       "generator": "Unix Makefiles",
@@ -73,15 +94,14 @@
       "remoteCopySourcesConcurrentCopies": "10",
       "remoteCopySourcesMethod": "sftp",
       "remoteCopyBuildOutput": true,
+      "remoteCopySourcesExclusionList": [ ".vs", ".git", "/build" ],
       "cmakeCommandArgs": "-DDEAL_II_DIR=/home/jfk/programy/dealii/build_debug/install",
       "buildCommandArgs": "-j2",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [
-        "linux_x64",
-        "IS_includes"
-      ]
+      "inheritEnvironments": [ "linux_x64", "IS_includes" ],
+      "intelliSenseMode": "linux-gcc-x64",
+      "variables": []
     },
-
     {
       "name": "WSL-Release",
       "generator": "Unix Makefiles",
@@ -98,14 +118,35 @@
       "remoteCopySourcesConcurrentCopies": "10",
       "remoteCopySourcesMethod": "sftp",
       "remoteCopyBuildOutput": true,
+      "remoteCopySourcesExclusionList": [ ".vs", ".git", "/build" ],
       "cmakeCommandArgs": "-DDEAL_II_DIR=/home/jfk/programy/dealii/build/install",
       "buildCommandArgs": "-j2",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [
-        "linux_x64",
-        "IS_includes"
-      ]
+      "inheritEnvironments": [ "linux_x64", "IS_includes" ],
+      "intelliSenseMode": "linux-gcc-x64",
+      "variables": []
+    },
+    {
+      "name": "Oasa-mpi2",
+      "generator": "Unix Makefiles",
+      "configurationType": "RelMinSize",
+      "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+      "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+      "cmakeExecutable": "/home/kotek/prg/CMake/build/install/bin/cmake",
+      "remoteCopySourcesExclusionList": [ ".vs", ".git", "/build" ],
+      "cmakeCommandArgs": "-DDEAL_II_DIR=/home/kotek/prg/dealii/build_mpi/install",
+      "buildCommandArgs": "-j20",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "linux_x64", "IS_includes" ],
+      "variables": [],
+      "intelliSenseMode": "linux-gcc-x64",
+      "remoteMachineName": "oasa.asu.cas.cz",
+      "remoteCMakeListsRoot": "/home/kotek/prg/vs/mhdeal_MPI",
+      "remoteBuildRoot": "/home/kotek/prg/vs/mhdeal_MPI/build",
+      "remoteInstallRoot": "/home/kotek/prg/vs/mhdeal_MPI/install",
+      "remoteCopySources": true,
+      "remoteCopyBuildOutput": true,
+      "remoteCopySourcesMethod": "sftp"
     }
   ]
 }
-

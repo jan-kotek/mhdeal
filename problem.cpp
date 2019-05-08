@@ -740,11 +740,11 @@ void Problem<equationsType, dim>::move_time_step_handle_outputs()
   if (parameters.output_solution)
     output_vector(current_limited_solution, "solution");
 
-  //if ((parameters.output_step < 0) || (time - last_output_time >= parameters.output_step))
-  //{
-  //  output_results();
-  //  last_output_time = time;
-  //}
+  if ((parameters.output_step < 0) || (time - last_output_time >= parameters.output_step))
+  {
+    output_results();
+    last_output_time = time;
+  }
   
  if (time_step_number<=1) output_results();
 

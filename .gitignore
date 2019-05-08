@@ -1,6 +1,7 @@
 *.avi
 *.gnuplot
 *.inst
+*.json
 mhdeal
 
 CMake.vars
