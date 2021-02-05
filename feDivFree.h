@@ -91,13 +91,13 @@ public:
   * called, provided that the
   * specified component is zero.
   */
-  double shape_value_component
+ double shape_value_component
   (const typename Triangulation<dim, spacedim>::cell_iterator & cell,
     const unsigned int i,
     const Point<dim> &p,
     const unsigned int component) const;
 
-  double shape_value_component
+double shape_value_component
   (const typename Triangulation<dim, spacedim>::cell_iterator & cell,
     const unsigned int i,
     const Point<dim> &p,

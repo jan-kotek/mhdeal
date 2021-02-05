@@ -24,9 +24,9 @@ void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMEN
 void set_parameters(Parameters<DIMENSION>& parameters, CSParameters& cs_parameters)
 {
   parameters.slope_limiter = parameters.vertexBased;
-  parameters.corner_a = Point<DIMENSION>(-6, -18., 0.);
-  parameters.corner_b = Point<DIMENSION>(6., 18., 0.5);
-  parameters.refinements = { 200, 1800 , 1 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
+  parameters.corner_a = Point<DIMENSION>(-5, -10., 0.);
+  parameters.corner_b = Point<DIMENSION>(5., 10., 0.5);
+  parameters.refinements = { 50, 100 , 1 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
   parameters.limit = false;
   parameters.limitB = false;
   parameters.use_div_free_space_for_B = false;
@@ -37,17 +37,17 @@ void set_parameters(Parameters<DIMENSION>& parameters, CSParameters& cs_paramete
   parameters.quadrature_order = 1;
   parameters.polynomial_order_dg = 0;
   parameters.patches = 0;
-  parameters.output_step = 0.1;
-  parameters.final_time = 100.;
+  parameters.output_step = 0.001;
+  parameters.final_time = 1.;
   parameters.output_file_prefix = "solution";
 
-  parameters.max_cells = 3000000;
+  parameters.max_cells = 100000;
   parameters.refine_every_nth_time_step = 2;
   parameters.perform_n_initial_refinements = 2;//15
-  parameters.refine_threshold = 0.5;
-  parameters.coarsen_threshold = 0.2;
+  parameters.refine_threshold = 0.000000000000001;
+  parameters.coarsen_threshold = 0.;
   parameters.volume_factor = 4;
-  parameters.time_interval_max_cells_multiplicator = 0.;
+  parameters.time_interval_max_cells_multiplicator = 10.;
 
   // plasma beta
   cs_parameters.beta = 0.15;

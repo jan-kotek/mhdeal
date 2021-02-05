@@ -29,8 +29,8 @@ void set_parameters(Parameters<DIMENSION>& parameters)
   parameters.corner_a = Point<DIMENSION>(0., 0., 0.);
   parameters.corner_b = Point<DIMENSION>(1., 1., 1.);
   parameters.refinements = { 10, 10, 10 };
-  parameters.limit = false;
-  parameters.use_div_free_space_for_B = true;
+  parameters.limit = true;
+  parameters.use_div_free_space_for_B = true;//true
   parameters.periodic_boundaries = { { 0, 1, 0 }, { 2, 3, 1 }};
   parameters.num_flux_type = Parameters<DIMENSION>::hlld;
   parameters.lax_friedrich_stabilization_value = 0.5;
@@ -40,8 +40,9 @@ void set_parameters(Parameters<DIMENSION>& parameters)
   parameters.polynomial_order_dg = 1;
   parameters.patches = 0;
   parameters.output_step = 1.e-2;
-  parameters.final_time = 0.;
-  parameters.debug = false;
+  parameters.final_time = 1.;
+  parameters.debug = true;
+  parameters.max_cells = 10000;
 }
 
 int main(int argc, char *argv[])

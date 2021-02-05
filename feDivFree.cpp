@@ -5,12 +5,17 @@
 template <int dim, int spacedim>
 FE_DG_DivFree<dim, spacedim>::FE_DG_DivFree()
   :
-  FiniteElement<dim, spacedim>(FiniteElementData<dim>(get_dpo_vector(DEGREE), dim, DEGREE, FiniteElementData<dim>::L2),
-    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(DEGREE), dim, DEGREE).dofs_per_cell, true),
-    std::vector<ComponentMask>({ ComponentMask({1, 0, 0}), ComponentMask({0, 1, 0}), ComponentMask({0, 0, 1}), ComponentMask({ 1, 0, 0 }), ComponentMask({ 1, 0, 0 }), ComponentMask({ 0, 1, 0 }), ComponentMask({ 0, 1, 0 }), ComponentMask({ 0, 0, 1 }), ComponentMask({ 0, 0, 1 }), ComponentMask({ 1, 1, 0 }), ComponentMask({ 1, 0, 1 }) }))
-  , FiniteElementIsConstantInterface<dim>()
-  //std::vector<ComponentMask>(10, ComponentMask({ true, true, true })))
-{
+  FiniteElement<dim, spacedim>
+    (FiniteElementData<dim>(get_dpo_vector(DEGREE), dim, DEGREE, 
+        FiniteElementData<dim>::L2),
+    std::vector<bool>(
+        FiniteElementData<dim>(get_dpo_vector(DEGREE), dim, DEGREE).dofs_per_cell, true),
+    std::vector<ComponentMask>(
+        { ComponentMask({1, 0, 0}), ComponentMask({0, 1, 0}), ComponentMask({0, 0, 1}), ComponentMask({ 1, 0, 0 }), ComponentMask({ 1, 0, 0 }), ComponentMask({ 0, 1, 0 }), ComponentMask({ 0, 1, 0 }), ComponentMask({ 0, 0, 1 }), ComponentMask({ 0, 0, 1 }), ComponentMask({ 1, 1, 0 }), ComponentMask({ 1, 0, 1 }) }))
+  , FiniteElementIsConstantInterface<dim>() 
+ // std::vector<ComponentMask>(10, ComponentMask({ true, true, true })))
+{ 
+   
   this->system_to_component_table[0] = std::pair<unsigned int, unsigned int>(0, 0);
   this->system_to_component_table[1] = std::pair<unsigned int, unsigned int>(1, 1);
   this->system_to_component_table[2] = std::pair<unsigned int, unsigned int>(2, 2);

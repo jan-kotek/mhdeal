@@ -29,7 +29,7 @@ Problem<equationsType, dim>::Problem(Parameters<dim>& parameters, Equations<equa
   fe_v_face_neighbor(mapping, fe, face_quadrature, neighbor_face_update_flags),
   fe_v_subface(mapping, fe, face_quadrature, face_update_flags),
   fe_v_subface_neighbor(mapping, fe, face_quadrature, neighbor_face_update_flags),
-  adaptivity(0),
+  adaptivity(0),//0
   solver(new AztecOO()),
   reset_after_refinement(true)
 {
@@ -756,9 +756,10 @@ void Problem<equationsType, dim>::move_time_step_handle_outputs()
 	 double global_cfl_time_step = Utilities::MPI::min(this->cfl_time_step, mpi_communicator);
 	 parameters.current_time_step_length = global_cfl_time_step;
   }
-
+  
   if (this->adaptivity)
-  {
+  { 
+	  
     // refine mesh
     // we use the unlimited solution here for two reasons:
     // - it has ghost elements
@@ -768,30 +769,30 @@ void Problem<equationsType, dim>::move_time_step_handle_outputs()
       bool refined = this->adaptivity->refine_mesh(time_step_number, time, current_unlimited_solution, dof_handler, triangulation, mapping);
     if (refined)
     {
-      // transfer solution
+        // transfer solution
 #ifdef HAVE_MPI
-      parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dof_handler);
+        parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dof_handler);
 #else
-      SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dof_handler);
+        SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dof_handler);
 #endif
 
-      if (time_step_number > 0)
-        soltrans.prepare_for_coarsening_and_refinement(prev_solution);
+        if (time_step_number > 0)
+            soltrans.prepare_for_coarsening_and_refinement(prev_solution);
 
-      // Refine the current triangulation.
-      triangulation.execute_coarsening_and_refinement();
+        // Refine the current triangulation.
+        triangulation.execute_coarsening_and_refinement();
 
-      // reinit structures, periodicity, etc.
-      this->setup_system();
+        // reinit structures, periodicity, etc.
+        this->setup_system();
 
-      current_limited_solution.reinit(locally_owned_dofs, mpi_communicator);
-      current_unlimited_solution.reinit(locally_relevant_dofs, mpi_communicator);
+        current_limited_solution.reinit(locally_owned_dofs, mpi_communicator);
+        current_unlimited_solution.reinit(locally_relevant_dofs, mpi_communicator);
 
-      // Now interpolate the solution
-      if (time_step_number > 0)
-      {
-        TrilinosWrappers::MPI::Vector interpolated_solution;
-        interpolated_solution.reinit(locally_owned_dofs, mpi_communicator);
+        // Now interpolate the solution
+        if (time_step_number > 0)
+        {
+            TrilinosWrappers::MPI::Vector interpolated_solution;
+            interpolated_solution.reinit(locally_owned_dofs, mpi_communicator);
 #ifdef HAVE_MPI
         soltrans.interpolate(interpolated_solution);
 #else

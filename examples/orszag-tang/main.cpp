@@ -4,7 +4,7 @@
 #include "parameters.h"
 #include "initialConditionOT.h"
 
-// Dimension of the problem - passed as a template parameter to pretty much every class.
+// Dimension of the problem - passed as  template parameter to pretty much every class.
 #define DIMENSION 3
 // Type of equations, must be from the enumeration EquationsType defined in equations.h.
 #define EQUATIONS EquationsTypeMhd
@@ -28,7 +28,7 @@ void set_parameters(Parameters<DIMENSION>& parameters)
   parameters.slope_limiter = parameters.vertexBased;
   parameters.corner_a = Point<DIMENSION>(0., 0., 0.);
   parameters.corner_b = Point<DIMENSION>(1., 1., 0.001);
-  parameters.refinements = { 160, 160, 1 };
+  parameters.refinements = { 200, 200, 1 };
   parameters.limit = false;
   parameters.use_div_free_space_for_B = true;
   parameters.periodic_boundaries = { { 0, 1, 0 },{ 2, 3, 1 } };
@@ -36,12 +36,12 @@ void set_parameters(Parameters<DIMENSION>& parameters)
   parameters.lax_friedrich_stabilization_value = 0.5;
   parameters.cfl_coefficient = .05;
   parameters.start_limiting_at = .05;
-  parameters.quadrature_order = 5;
+  parameters.quadrature_order = 1;
   parameters.polynomial_order_dg = 1;
   parameters.patches = 0;
-  parameters.output_step = 1.e-2;
+  parameters.output_step = 2.e-2;
   parameters.final_time = .5;
-  parameters.debug = false;
+  parameters.debug = parameters.Adaptivity;
 }
 
 int main(int argc, char *argv[])
@@ -55,6 +55,20 @@ int main(int argc, char *argv[])
     Parameters<DIMENSION> parameters;
     set_parameters(parameters);
     parameters.delete_old_outputs(mpi_communicator);
+    std::cout << std::endl <<
+        parameters.limit << std::endl <<
+        parameters.limitB << std::endl <<
+        parameters.limit_edges_and_vertices << std::endl <<
+        parameters.output_file_prefix << std::endl <<
+        parameters.use_div_free_space_for_B << std::endl <<
+
+        parameters.lax_friedrich_stabilization_value << std::endl <<
+        parameters.cfl_coefficient << std::endl <<
+        parameters.quadrature_order << std::endl <<
+        parameters.polynomial_order_dg << std::endl <<
+        parameters.patches << std::endl <<
+        parameters.output_step << std::endl <<
+        parameters.final_time << std::endl;
 
     // Declaration of triangulation. The triangulation is not initialized here, but rather in the constructor of Parameters class.
 #ifdef HAVE_MPI

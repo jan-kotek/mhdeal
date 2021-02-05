@@ -79,7 +79,7 @@
       "variables": []
     },
     {
-      "name": "WSL-Debug",
+      "name": "WSL-Debug2",
       "generator": "Unix Makefiles",
       "remoteMachineName": "localhost",
       "configurationType": "Debug",
@@ -103,7 +103,7 @@
       "variables": []
     },
     {
-      "name": "WSL-Release",
+      "name": "WSL-Release2",
       "generator": "Unix Makefiles",
       "remoteMachineName": "localhost",
       "configurationType": "Release",
@@ -144,6 +144,28 @@
       "remoteCMakeListsRoot": "/home/kotek/prg/vs/mhdeal_MPI",
       "remoteBuildRoot": "/home/kotek/prg/vs/mhdeal_MPI/build",
       "remoteInstallRoot": "/home/kotek/prg/vs/mhdeal_MPI/install",
+      "remoteCopySources": true,
+      "remoteCopyBuildOutput": true,
+      "remoteCopySourcesMethod": "sftp"
+    },
+    {
+      "name": "Oasa-mpi3",
+      "generator": "Unix Makefiles",
+      "configurationType": "Release",
+      "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+      "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+      "cmakeExecutable": "/home/kotek/prg/CMake/build/install/bin/cmake",
+      "remoteCopySourcesExclusionList": [ ".vs", ".git", "/build" ],
+      "cmakeCommandArgs": "-DDEAL_II_DIR=/home/kotek/prg/dealii/build_mpi/install",
+      "buildCommandArgs": "-j20",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "linux_x64", "IS_includes" ],
+      "variables": [],
+      "intelliSenseMode": "linux-gcc-x64",
+      "remoteMachineName": "oasa.asu.cas.cz",
+      "remoteCMakeListsRoot": "/home/kotek/prg/vs/mhdeal_mpi3",
+      "remoteBuildRoot": "/home/kotek/prg/vs/mhdeal_mpi3/build",
+      "remoteInstallRoot": "/home/kotek/prg/vs/mhdeal_mpi3/install",
       "remoteCopySources": true,
       "remoteCopyBuildOutput": true,
       "remoteCopySourcesMethod": "sftp"

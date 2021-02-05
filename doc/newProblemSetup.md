@@ -1,4 +1,4 @@
-This document describes all that is necessary to insert a new problem so that it can get computed. For the time being, it must be a full MHD problem (in future, there might be an option to also get an Euler problem solved - currently the support is not complete).
+0This document describes all that is necessary to insert a new problem so that it can get computed. For the time being, it must be a full MHD problem (in future, there might be an option to also get an Euler problem solved - currently the support is not complete).
 
 0. Running existing examples
   * CMake configuration by default prepares the library (project 'mhdeal') together with several examples (in the 'examples' directory).
