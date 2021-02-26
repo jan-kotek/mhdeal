@@ -772,6 +772,11 @@ void Problem<equationsType, dim>::move_time_step_handle_outputs()
         // transfer solution
 #ifdef HAVE_MPI
         parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dof_handler);
+        /*if (time_step_number > 0)
+        {
+            soltrans.prepare_for_serialization(prev_solution);
+            triangulation.save("serialized.bin");
+        }*/
 #else
         SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dof_handler);
 #endif

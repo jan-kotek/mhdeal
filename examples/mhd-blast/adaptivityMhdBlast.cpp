@@ -142,68 +142,28 @@ bool AdaptivityMhdBlast<dim>::refine_mesh(int time_step, double time, TrilinosWr
   int max_calls_ = this->parameters.max_cells + (int)std::floor(time * this->parameters.max_cells * this->parameters.time_interval_max_cells_multiplicator / this->parameters.final_time);
   GridRefinement::refine_and_coarsen_fixed_fraction(triangulation, gradient_indicator, this->parameters.refine_threshold, this->parameters.coarsen_threshold, max_calls_);
  
-////#ifdef HAVE_MPI
-//  for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
-//    if (cell->refine_flag_set())
-//
-//      cell->set_refine_flag(RefinementCase<3>::cut_y);
-////#endif
-//
-//  triangulation.prepare_coarsening_and_refinement();
-//  std::cout << " ! " << triangulation.get_mesh_smoothing() << " ?";
-//#ifdef HAVE_MPI
-//  for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
-//    if (cell->refine_flag_set())
-//      cell->set_refine_flag(RefinementCase<3>::cut_y);
-//  std::cout << triangulation.get_anisotropic_refinement_flag() << " ARF_MPI ";
-//#endif
-//  std::cout << triangulation.get_anisotropic_refinement_flag() << " ARF ";
-//  return true;
-
-
-
- // int i = 0;
- // //triangulation.prepare_coarsening_and_refinement();
-
- // for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
- // {
- //     
-
- //     if (cell->refine_flag_set())
- //     {
- //         i++;
- //         unsigned int rfs = 0;
- //         rfs = cell->refine_flag_set();
- //         std::cout << "GRF" << rfs << "<-GRF  ";
- //         cell->set_refine_flag(RefinementCase<3>::cut_x);
- //         
- //         rfs = cell->refine_flag_set();
- //         std::cout<<"GRF" << rfs <<"<-GRF  ";
-
- //     }
- // }
- // std::cout<<"\n"  << i << "/";
- // std::cout << triangulation.get_anisotropic_refinement_flag() << "-";
- //// triangulation.execute_coarsening_and_refinement();
- //
- // std::cout<<" ! "<<triangulation.get_mesh_smoothing()<<" ?";
- // std::cout << triangulation.get_anisotropic_refinement_flag() << " ARF ";
-
+//The following is tricky but usefull for anisotropic mesh refinement (eg solving 2D problem in 3D)
+//CANT WORK WITH distributed MESH !! (fundamental dealii limitation) 
+ //aditionally mesh smoothing in declaration of Triangulation class must be properly set
+#ifdef HAVE_MPI
+#else
  // return true;
   std::cout << triangulation.get_anisotropic_refinement_flag() << "-ARF ";
-//#ifdef HAVE_MPI
+
   for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
       if (cell->refine_flag_set())
           cell->set_refine_flag(RefinementCase<3>::cut_xy);
-//#endif
+
 
   triangulation.prepare_coarsening_and_refinement();
 
-//#ifdef HAVE_MPI
+
   for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
       if (cell->refine_flag_set())
           cell->set_refine_flag(RefinementCase<3>::cut_xy);
-//#endif
+#endif
+
+
 
   return true;
 
