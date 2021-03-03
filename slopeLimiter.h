@@ -11,7 +11,7 @@ public:
   SlopeLimiter(const Parameters<dim>& parameters, const MappingQ1<dim>& mapping, const FESystem<dim>& fe, DoFHandler<dim>& dof_handler, 
      unsigned int& dofs_per_cell,
 #ifdef HAVE_MPI
-    parallel::distributed::Triangulation<dim>& triangulation,
+    parallel::shared::Triangulation<dim>& triangulation,
 #else
     Triangulation<dim>& triangulation,
 #endif
@@ -48,7 +48,7 @@ protected:
   std::map<unsigned int, PostprocessData> postprocessData;
   
 #ifdef HAVE_MPI
-  parallel::distributed::Triangulation<dim>& triangulation;
+  parallel::shared::Triangulation<dim>& triangulation;
 #else
   Triangulation<dim>& triangulation;
 #endif
@@ -69,7 +69,7 @@ public:
   VertexBasedSlopeLimiter(const Parameters<dim>& parameters, const MappingQ1<dim>& mapping, const FESystem<dim>& fe, DoFHandler<dim>& dof_handler,  
     unsigned int& dofs_per_cell,
 #ifdef HAVE_MPI
-    parallel::distributed::Triangulation<dim>& triangulation,
+    parallel::shared::Triangulation<dim>& triangulation,
 #else
     Triangulation<dim>& triangulation,
 #endif
@@ -87,7 +87,7 @@ public:
   BarthJespersenSlopeLimiter(const Parameters<dim>& parameters, const MappingQ1<dim>& mapping, const FESystem<dim>& fe, DoFHandler<dim>& dof_handler,  
     unsigned int& dofs_per_cell,
 #ifdef HAVE_MPI
-    parallel::distributed::Triangulation<dim>& triangulation,
+    parallel::shared::Triangulation<dim>& triangulation,
 #else
     Triangulation<dim>& triangulation,
 #endif

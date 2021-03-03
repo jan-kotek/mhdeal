@@ -121,7 +121,7 @@ void AdaptivityMhdBlast<dim>::calculate_jumps(TrilinosWrappers::MPI::Vector& sol
 template <int dim>
 bool AdaptivityMhdBlast<dim>::refine_mesh(int time_step, double time, TrilinosWrappers::MPI::Vector& solution, const DoFHandler<dim>& dof_handler,
 #ifdef HAVE_MPI
-  parallel::distributed::Triangulation<dim>& triangulation
+  parallel::shared::Triangulation<dim>& triangulation
 #else
   Triangulation<dim>& triangulation
 #endif

@@ -57,11 +57,13 @@
 #include <Sacado.hpp>
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/derivative_approximation.h>
+
+
 
 #ifndef NEGLIGIBLE
 #define NEGLIGIBLE 1e-12

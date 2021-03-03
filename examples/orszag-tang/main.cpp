@@ -10,7 +10,7 @@
 #define EQUATIONS EquationsTypeMhd
 
 #ifdef HAVE_MPI
-void set_triangulation(parallel::distributed::Triangulation<DIMENSION>& triangulation, Parameters<DIMENSION>& parameters)
+void set_triangulation(parallel::shared::Triangulation<DIMENSION>& triangulation, Parameters<DIMENSION>& parameters)
 #else
 void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMENSION>& parameters)
 #endif
@@ -21,6 +21,7 @@ void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMEN
   for (std::vector<std::array<int, 3> >::const_iterator it = parameters.periodic_boundaries.begin(); it != parameters.periodic_boundaries.end(); it++)
     dealii::GridTools::collect_periodic_faces(triangulation, (*it)[0], (*it)[1], (*it)[2], matched_pairs);
   triangulation.add_periodicity(matched_pairs);
+ 
 }
 
 void set_parameters(Parameters<DIMENSION>& parameters)  
@@ -72,7 +73,7 @@ int main(int argc, char *argv[])
 
     // Declaration of triangulation. The triangulation is not initialized here, but rather in the constructor of Parameters class.
 #ifdef HAVE_MPI
-    parallel::distributed::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::none), parallel::distributed::Triangulation<DIMENSION>::no_automatic_repartitioning);
+    parallel::shared::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::none), parallel::shared::Triangulation<DIMENSION>::no_automatic_repartitioning);
 #else
     Triangulation<DIMENSION> triangulation;
 #endif    

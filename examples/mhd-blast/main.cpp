@@ -11,17 +11,23 @@
 #define EQUATIONS EquationsTypeMhd
 
 #ifdef HAVE_MPI
-void set_triangulation(parallel::distributed::Triangulation<DIMENSION>& triangulation,  Parameters<DIMENSION>& parameters)
+void set_triangulation(parallel::shared::Triangulation<DIMENSION>& triangulation,  Parameters<DIMENSION>& parameters)
 #else
 void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMENSION>& parameters)
 #endif
 {
   GridGenerator::subdivided_hyper_rectangle(triangulation, parameters.refinements, parameters.corner_a, parameters.corner_b, true);
 
-  std::vector<dealii::GridTools::PeriodicFacePair< dealii::TriaIterator<dealii::CellAccessor<DIMENSION> > > > matched_pairs;
-  for (std::vector<std::array<int, 3> >::const_iterator it = parameters.periodic_boundaries.begin(); it != parameters.periodic_boundaries.end(); it++)
-    dealii::GridTools::collect_periodic_faces(triangulation, (*it)[0], (*it)[1], (*it)[2], matched_pairs);
-  triangulation.add_periodicity(matched_pairs);
+  //std::vector<dealii::GridTools::PeriodicFacePair< dealii::TriaIterator<dealii::CellAccessor<DIMENSION> > > > matched_pairs;
+  //std::vector<GridTools::PeriodicFacePair<typename parallel::shared::Triangulation<DIMENSION>::cell_iterator> >matched_pairs;
+  //for (std::vector<std::array<int, 3> >::const_iterator it = parameters.periodic_boundaries.begin(); it != parameters.periodic_boundaries.end(); it++)
+  //  dealii::GridTools::collect_periodic_faces(triangulation, (*it)[0], (*it)[1], (*it)[2], matched_pairs);
+  //triangulation.add_periodicity(matched_pairs);
+  //dealii::GridTools::collect_periodic_faces(triangulation, 0, 1, 0, matched_pairs);
+  //dealii::GridTools::collect_periodic_faces(triangulation, 2, 3, 1, matched_pairs);
+  
+  
+
 }
 
 void set_parameters(Parameters<DIMENSION>& parameters)
@@ -114,7 +120,7 @@ int main(int argc, char *argv[])
     // Declaration of triangulation. The triangulation is not initialized here, but rather in the constructor of Parameters class.
 #ifdef HAVE_MPI
   
-    parallel::distributed::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices | Triangulation<DIMENSION>::allow_anisotropic_smoothing));
+    parallel::shared::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices | Triangulation<DIMENSION>::allow_anisotropic_smoothing));
     
 #else
     Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::allow_anisotropic_smoothing);
@@ -135,6 +141,7 @@ int main(int argc, char *argv[])
     // Set adaptivity
     problem.set_adaptivity(&adaptivity);
     // Run the problem - entire transient problem.
+
     problem.run();
   }
   catch (std::exception &exc)

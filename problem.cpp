@@ -3,7 +3,7 @@
 template <EquationsType equationsType, int dim>
 Problem<equationsType, dim>::Problem(Parameters<dim>& parameters, Equations<equationsType, dim>& equations,
 #ifdef HAVE_MPI
-  parallel::distributed::Triangulation<dim>& triangulation,
+  parallel::shared::Triangulation<dim>& triangulation,
 #else
   Triangulation<dim>& triangulation,
 #endif
@@ -69,6 +69,12 @@ void Problem<equationsType, dim>::setup_system()
   locally_owned_dofs = dof_handler.locally_owned_dofs();
   constraints.clear();
   constraints.reinit(locally_relevant_dofs);
+
+
+
+
+
+
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   DynamicSparsityPattern dsp(locally_relevant_dofs);
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
@@ -131,6 +137,9 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
   // Local (cell) matrices and rhs - for the currently assembled element and the neighbor
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double> cell_rhs(dofs_per_cell);
+
+
+
 
   // Loop through all cells.
   int ith_cell = 0;
@@ -674,6 +683,7 @@ template <EquationsType equationsType, int dim>
 void Problem<equationsType, dim>::run()
 {
   // Preparations.
+    
   setup_system();
   current_limited_solution.reinit(locally_owned_dofs, mpi_communicator);
   current_unlimited_solution.reinit(locally_relevant_dofs, mpi_communicator);
@@ -683,6 +693,13 @@ void Problem<equationsType, dim>::run()
   output_base();
   exit(1);
 #endif
+  if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+  {
+      LOGL(0, "tady to fachá" );
+      
+  }
+ 
+
 
   int adaptivity_step = 0;
   while (time < parameters.final_time)
@@ -771,7 +788,8 @@ void Problem<equationsType, dim>::move_time_step_handle_outputs()
     {
         // transfer solution
 #ifdef HAVE_MPI
-        parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dof_handler);
+        //parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dof_handler);
+        SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> soltrans(dof_handler);
         /*if (time_step_number > 0)
         {
             soltrans.prepare_for_serialization(prev_solution);
@@ -799,7 +817,8 @@ void Problem<equationsType, dim>::move_time_step_handle_outputs()
             TrilinosWrappers::MPI::Vector interpolated_solution;
             interpolated_solution.reinit(locally_owned_dofs, mpi_communicator);
 #ifdef HAVE_MPI
-        soltrans.interpolate(interpolated_solution);
+        //soltrans.interpolate(interpolated_solution);
+         soltrans.interpolate(prev_solution, interpolated_solution);
 #else
         soltrans.interpolate(prev_solution, interpolated_solution);
 #endif

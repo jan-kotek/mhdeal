@@ -17,7 +17,7 @@ class Problem
 public:
   Problem(Parameters<dim>& parameters, Equations<equationsType, dim>& equations,
 #ifdef HAVE_MPI
-    parallel::distributed::Triangulation<dim>& triangulation,
+    parallel::shared::Triangulation<dim>& triangulation,
 #else
     Triangulation<dim>& triangulation,
 #endif
@@ -59,7 +59,7 @@ public:
 
   // Triangulation - passed as a constructor parameter
 #ifdef HAVE_MPI
-  parallel::distributed::Triangulation<dim>& triangulation;
+  parallel::shared::Triangulation<dim>& triangulation;
 #else
   Triangulation<dim>& triangulation;
 #endif

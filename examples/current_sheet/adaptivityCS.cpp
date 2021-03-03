@@ -295,7 +295,7 @@ void AdaptivityCS<dim>::calculate_jumps(TrilinosWrappers::MPI::Vector& solution,
 template <int dim>
 bool AdaptivityCS<dim>::refine_mesh(int time_step, double time, TrilinosWrappers::MPI::Vector& solution, const DoFHandler<dim>& dof_handler,
 #ifdef HAVE_MPI
-  parallel::distributed::Triangulation<dim>& triangulation
+  parallel::shared::Triangulation<dim>& triangulation
 #else
   Triangulation<dim>& triangulation
 #endif
