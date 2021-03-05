@@ -30,28 +30,51 @@ void InitialConditionCS<equationsType, dim>::vector_value(const std::vector<Poin
 		//momentum density perturbation //if (p[i] < 0.5)
 		//value_list[i][1] = 0.005 * std::sin(std::rand());
 		//value_list[i][2] = 0.005 * std::sin(std::rand());
+
 		if (((abs(points[i][0]) < (cb[0] - 1.)) and (abs(points[i][1]) < (cb[1] - 1.))))
 		{
 			value_list[i][1] = 0.005 * dis(gen);
 			value_list[i][2] = 0.005 * dis(gen);
-		}
-		value_list[i][3] = 0.;
+
 
 			
+		}
+		
+		
+
+
+				
 
 
 		value_list[i][5] = 0.0; //magnetic field
 		value_list[i][6] = std::tanh(p[0]);
 		value_list[i][7] = 0.;
 
+
+		value_list[i][1] = 0.; //momentum density
+		value_list[i][2] = 0.;
+		value_list[i][3] = 0.;
+
+		value_list[i][5] = 0.0 / std::sqrt(2.);
+		value_list[i][6] = 0.0 / std::sqrt(2.);
+
+		if (std::sqrt(points[i][0] * points[i][0] + points[i][1] * points[i][1]) < 2.1)
+			value_list[i][4] = 10. / (this->parameters.gas_gamma - 1.0) + 0.5 * (value_list[i][5] * value_list[i][5] + value_list[i][6] * value_list[i][6] + value_list[i][7] * value_list[i][7]);
+		else
+			value_list[i][4] = .1 / (this->parameters.gas_gamma - 1.0) + 0.5 * (value_list[i][5] * value_list[i][5] + value_list[i][6] * value_list[i][6] + value_list[i][7] * value_list[i][7]);
 	}
 
 	//energy density
-
+	/*
 	for (unsigned int i = 0; i < points.size(); ++i)
 	{
 		const Point<dim>& p = points[i];
 		value_list[i][4] = (1.15 + cs_parameters.beta - Equations<EquationsTypeMhd, dim >::compute_magnetic_energy(value_list[i])) / (2. / 3) + Equations<EquationsTypeMhd, dim >::compute_magnetic_energy(value_list[i]);
 	}
+	*/
+
+
+
+
 }
 template class InitialConditionCS<EquationsTypeMhd, 3>;

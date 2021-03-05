@@ -6,6 +6,7 @@
 #include "initialConditionCS.h"
 #include "boundaryConditionCS.h"
 #include "adaptivityCS.h"
+#include "adaptivityMhdBlast.h"
 
 // Dimension of the problem - passed as a template parameter to pretty much every class.
 #define DIMENSION 3
@@ -27,27 +28,26 @@ void set_parameters(Parameters<DIMENSION>& parameters, CSParameters& cs_paramete
   parameters.corner_a = Point<DIMENSION>(-5, -10., 0.);
   parameters.corner_b = Point<DIMENSION>(5., 10., 0.5);
   parameters.refinements = { 50, 100 , 1 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
-  parameters.limit = false;
+  parameters.limit = true;
   parameters.limitB = false;
   parameters.use_div_free_space_for_B = false;
   parameters.num_flux_type = Parameters<DIMENSION>::hlld;
-  parameters.lax_friedrich_stabilization_value = 0.5;
-  parameters.cfl_coefficient = .01;
-  parameters.start_limiting_at = -1e-6;//e-6
+  parameters.lax_friedrich_stabilization_value = 0.75;
+  parameters.cfl_coefficient = .05;
+  parameters.start_limiting_at = 1e-6;//e-6
   parameters.quadrature_order = 1;
-  parameters.polynomial_order_dg = 0;
+  parameters.polynomial_order_dg = 1;
   parameters.patches = 0;
   parameters.output_step = 0.001;
   parameters.final_time = 1.;
   parameters.output_file_prefix = "solution";
 
   parameters.max_cells = 100000;
-  parameters.refine_every_nth_time_step = 2;
-  parameters.perform_n_initial_refinements = 2;//15
-  parameters.refine_threshold = 0.000000000000001;
-  parameters.coarsen_threshold = 0.;
-  parameters.volume_factor = 4;
-  parameters.time_interval_max_cells_multiplicator = 10.;
+  parameters.refine_every_nth_time_step = 10;
+  parameters.perform_n_initial_refinements = 5;
+  parameters.refine_threshold = 0.3;
+  parameters.coarsen_threshold = 0.2;
+  parameters.volume_factor = 3;
 
   // plasma beta
   cs_parameters.beta = 0.15;
@@ -108,9 +108,9 @@ int main(int argc, char *argv[])
 
     // Declaration of triangulation. The triangulation is not initialized here, but rather in the constructor of Parameters class.
 #ifdef HAVE_MPI
-    parallel::shared::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices));
+    parallel::shared::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::allow_anisotropic_smoothing));
 #else
-    Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::limit_level_difference_at_vertices);
+    Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::allow_anisotropic_smoothing);
 #endif    
     set_triangulation(triangulation, parameters);
 
@@ -120,11 +120,11 @@ int main(int argc, char *argv[])
     // Set up equations - see equations.h, equationsMhd.h
     Equations<EQUATIONS, DIMENSION> equations;
     // Adaptivity
-    AdaptivityCS<DIMENSION> adaptivity(parameters, mpi_communicator);
+    AdaptivityMhdBlast<DIMENSION> adaptivity(parameters, mpi_communicator);
     // Put together the problem.
     Problem<EQUATIONS, DIMENSION> problem(parameters, equations, triangulation, initial_condition, boundary_conditions);
     // Set adaptivity
-    // problem.set_adaptivity(&adaptivity);
+    problem.set_adaptivity(&adaptivity);
     // Run the problem - entire transient problem.
     problem.run();
   }

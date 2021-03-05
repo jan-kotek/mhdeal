@@ -314,7 +314,26 @@ bool AdaptivityCS<dim>::refine_mesh(int time_step, double time, TrilinosWrappers
   int max_calls_ = this->parameters.max_cells + (int)std::floor(time * this->parameters.max_cells * this->parameters.time_interval_max_cells_multiplicator / this->parameters.final_time);
   GridRefinement::refine_and_coarsen_fixed_fraction(triangulation, gradient_indicator, this->parameters.refine_threshold, this->parameters.coarsen_threshold, max_calls_);
 
+
+  //anisotropic
   triangulation.prepare_coarsening_and_refinement();
+
+    /*anisotropic
+  std::cout << triangulation.get_anisotropic_refinement_flag() << "-ARF ";
+
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
+      if (cell->refine_flag_set())
+          cell->set_refine_flag(RefinementCase<3>::cut_xy);
+
+
+  triangulation.prepare_coarsening_and_refinement();
+
+
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
+      if (cell->refine_flag_set())
+          cell->set_refine_flag(RefinementCase<3>::cut_xy);
+
+  //anisotropic */
 
   return true;
 }

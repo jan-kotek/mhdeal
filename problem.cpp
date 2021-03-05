@@ -188,20 +188,20 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
             int n_children = cell->face(face_no)->number_of_children();
             unsigned int neighbor2;
             if (this->parameters.is_periodic_boundary(cell->face(face_no)->boundary_id()))
-              neighbor2 = cell->periodic_neighbor_of_periodic_neighbor(face_no);
+              neighbor2 = cell->periodic_neighbor_face_no(face_no); //
             else
-              neighbor2 = cell->neighbor_of_neighbor(face_no);
+              neighbor2 = cell->neighbor_face_no(face_no); //
 
             if (parameters.debug & parameters.DetailSteps)
               LOGL(1, " - neighbor more split, " << n_children << " children");
 
-            for (unsigned int subface_no = 0; subface_no < n_children; ++subface_no)
+            for (unsigned int subface_no = 0; subface_no < n_children; ++subface_no) 
             {
               const typename DoFHandler<dim>::active_cell_iterator neighbor_child =
                 (this->parameters.is_periodic_boundary(cell->face(face_no)->boundary_id()) ?
                   cell->periodic_neighbor_child_on_subface(face_no, subface_no) :
                   cell->neighbor_child_on_subface(face_no, subface_no));
-
+              Assert(!neighbor_child->has_children(), ExcInternalError()); //
               fe_v_subface.reinit(cell, face_no, subface_no);
               fe_v_face_neighbor.reinit(neighbor_child, neighbor2);
               neighbor_child->get_dof_indices(dof_indices_neighbor);
@@ -211,7 +211,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
           }
           // Here the neighbor face is less split than the current one, there is some transformation needed.
           // Not performed if there is no adaptivity involved.
-          else if (cell->neighbor_or_periodic_neighbor(face_no)->level() != cell->level())
+          /*else if (cell->neighbor_or_periodic_neighbor(face_no)->level() != cell->level())
           {
             if (parameters.debug & parameters.DetailSteps)
               LOGL(1, " - neighbor less split");
@@ -230,24 +230,45 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
             fe_v_subface_neighbor.reinit(neighbor, neighbor_face_no, neighbor_subface_no);
 
             assemble_face_term(face_no, fe_v_face, fe_v_subface_neighbor, false, numbers::invalid_unsigned_int, cell_rhs);
-          }
+          }*/
+
+
           // Here the neighbor face fits exactly the current face of the current element, this is the 'easy' part.
           // This is the only face assembly case performed without adaptivity.
           else
           {
-            if (parameters.debug & parameters.DetailSteps)
-              LOGL(1, " - neighbor equally split");
-            const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor_or_periodic_neighbor(face_no);
-            neighbor->get_dof_indices(dof_indices_neighbor);
+              bool they_fit;
+              /*if (this->parameters.is_periodic_boundary(cell->face(face_no)->boundary_id()))
+              {
+                  they_fit = (!cell->periodic_neighbor_is_coarser(face_no) &&
+                      (periodic_neighbor->index() > cell->index() ||
+                          (periodic_neighbor->level() < cell->level() &&
+                              periodic_neighbor->index() == cell->index())))
+              
+              else}*/
+              {
+                  they_fit = (!cell->neighbor_is_coarser(face_no) && 1);
+                   //   (cell->neighbor->index() > cell->index() ||
+                     //     (cell->neighbor->level() < cell->level() &&
+                       //       cell->neighbor->index() == cell->index())));
+                 
+              }
+              if (they_fit)
+              {
+                  if (parameters.debug & parameters.DetailSteps)
+                      LOGL(1, " - neighbor equally split");
+                  const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor_or_periodic_neighbor(face_no);
+                  neighbor->get_dof_indices(dof_indices_neighbor);
 
-            fe_v_face.reinit(cell, face_no);
-            const unsigned int neighbor2 =
-              (this->parameters.is_periodic_boundary(cell->face(face_no)->boundary_id()) ?
-                cell->periodic_neighbor_of_periodic_neighbor(face_no) :
-                cell->neighbor_of_neighbor(face_no));
+                  fe_v_face.reinit(cell, face_no);
+                  const unsigned int neighbor2 =
+                      (this->parameters.is_periodic_boundary(cell->face(face_no)->boundary_id()) ?
+                          cell->periodic_neighbor_of_periodic_neighbor(face_no) :
+                          cell->neighbor_of_neighbor(face_no));
 
-            fe_v_face_neighbor.reinit(neighbor, neighbor2);
-            assemble_face_term(face_no, fe_v_face, fe_v_face_neighbor, false, numbers::invalid_unsigned_int, cell_rhs);
+                  fe_v_face_neighbor.reinit(neighbor, neighbor2);
+                  assemble_face_term(face_no, fe_v_face, fe_v_face_neighbor, false, numbers::invalid_unsigned_int, cell_rhs);
+              }
           }
         }
       }
