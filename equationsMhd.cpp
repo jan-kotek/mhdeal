@@ -4,7 +4,7 @@
 template <int dim>
 std::vector<std::string> Equations<EquationsTypeMhd, dim>::component_names()
 {
-  return{ "density", "momentum", "momentum", "momentum", "energy", "magnetic_field", "magnetic_field", "magnetic_field" };
+  return{ "density", "momentum", "momentum", "momentum_z", "energy", "magnetic_field", "magnetic_field", "magnetic_field_z" };
 }
 
 template <int dim>
@@ -12,13 +12,14 @@ std::vector<DataComponentInterpretation::DataComponentInterpretation> Equations<
 {
   std::vector<DataComponentInterpretation::DataComponentInterpretation> data_component_interpretation;
   data_component_interpretation.push_back(DataComponentInterpretation::component_is_scalar);
-  data_component_interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+  //data_component_interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
   data_component_interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
   data_component_interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
   data_component_interpretation.push_back(DataComponentInterpretation::component_is_scalar);
+  data_component_interpretation.push_back(DataComponentInterpretation::component_is_scalar);
   data_component_interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
   data_component_interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-  data_component_interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+  data_component_interpretation.push_back(DataComponentInterpretation::component_is_scalar);
   return data_component_interpretation;
 }
 
@@ -73,9 +74,9 @@ double Equations<EquationsTypeMhd, dim>::compute_magnetic_field_divergence(const
 }
 
 template <int dim>
-std::array<double, dim> Equations<EquationsTypeMhd, dim>::compute_magnetic_field_curl(const std::vector<Tensor<1, dim> > &W)
+std::array<double, 3> Equations<EquationsTypeMhd, dim>::compute_magnetic_field_curl(const std::vector<Tensor<1, dim> > &W)
 {
-  std::array<double, dim> curl_ = { W[7][1] - W[6][2], W[5][2] - W[7][0], W[6][0] - W[5][1] };
+  std::array<double, 3> curl_ = { W[7][1] - 0., 0. - W[7][0], W[6][0] - W[5][1] };
 
   return curl_;
 }
@@ -105,14 +106,7 @@ void Equations<EquationsTypeMhd, dim>::compute_flux_matrix(const values_vector &
   flux[6][1] = 0.0;
   flux[7][1] = ((W[2] * oneOverRho) * W[7]) - ((W[3] * oneOverRho) * W[6]);
 
-  flux[0][2] = W[3];
-  flux[1][2] = (W[3] * W[1] * oneOverRho) - W[7] * W[5];
-  flux[2][2] = (W[3] * W[2] * oneOverRho) - W[7] * W[6];
-  flux[3][2] = (W[3] * W[3] * oneOverRho) - W[7] * W[7] + total_pressure;
-  flux[4][2] = (W[4] + total_pressure) * (W[3] * oneOverRho) - (W[7] * UB);
-  flux[5][2] = ((W[3] * oneOverRho) * W[5]) - ((W[1] * oneOverRho) * W[7]);
-  flux[6][2] = ((W[3] * oneOverRho) * W[6]) - ((W[2] * oneOverRho) * W[7]);
-  flux[7][2] = 0.0;
+
 }
 
 template <int dim>
@@ -145,16 +139,8 @@ void Equations<EquationsTypeMhd, dim>::compute_flux_vector(const Tensor<1, dim> 
     flux[5] = ((W[2] * oneOverRho) * W[5]) - ((W[1] * oneOverRho) * W[6]);
     flux[6] = 0.0;
     flux[7] = ((W[2] * oneOverRho) * W[7]) - ((W[3] * oneOverRho) * W[6]);
-    break;
-  case 2:
-    flux[0] = W[3];
-    flux[1] = (W[3] * W[1] * oneOverRho) - W[7] * W[5];
-    flux[2] = (W[3] * W[2] * oneOverRho) - W[7] * W[6];
-    flux[3] = (W[3] * W[3] * oneOverRho) - W[7] * W[7] + total_pressure;
-    flux[4] = (E + total_pressure) * (W[3] * oneOverRho) - (W[7] * UB);
-    flux[5] = ((W[3] * oneOverRho) * W[5]) - ((W[1] * oneOverRho) * W[7]);
-    flux[6] = ((W[3] * oneOverRho) * W[6]) - ((W[2] * oneOverRho) * W[7]);
-    flux[7] = 0.0;
+    
+  
   }
     for (unsigned int d = 0; d < n_components; ++d)
       flux[d] *= sign;
@@ -178,14 +164,14 @@ Equations<EquationsTypeMhd, dim>::Postprocessor::evaluate_vector_field(
   {
     const double density = inputs.solution_values[q](0);
 
-    for (unsigned int d = 0; d < dim; ++d)
+    for (unsigned int d = 0; d < 3; ++d)
       computed_quantities[q](d) = inputs.solution_values[q](1 + d) / density;
 
-    computed_quantities[q](dim) = equations.compute_pressure(inputs.solution_values[q]);
-    computed_quantities[q](dim + 1) = equations.compute_magnetic_field_divergence(inputs.solution_gradients[q]);
+    computed_quantities[q](3) = equations.compute_pressure(inputs.solution_values[q]);
+    computed_quantities[q](3 + 1) = equations.compute_magnetic_field_divergence(inputs.solution_gradients[q]);
     auto curl_ = equations.compute_magnetic_field_curl(inputs.solution_gradients[q]);
-    for (unsigned int d = 0; d < dim; ++d)
-      computed_quantities[q](dim + 2 + d) = curl_[d];
+    for (unsigned int d = 0; d < 3; ++d)
+      computed_quantities[q](3 + 2 + d) = curl_[d];
   }
 }
 #else
@@ -205,18 +191,18 @@ Equations<EquationsTypeMhd, dim>::Postprocessor::compute_derived_quantities_vect
   {
     const double density = uh[q](0);
 
-    for (unsigned int d = 0; d < dim; ++d)
+    for (unsigned int d = 0; d < 3; ++d)
       computed_quantities[q](d) = uh[q](1 + d) / density;
 
     std::array<double, n_components> uh_q;
     for (unsigned int d = 0; d < n_components; ++d)
       uh_q[d] = uh[q][d];
 
-    computed_quantities[q](dim) = Equations<EquationsTypeMhd, dim>::compute_pressure(uh_q, parameters);
-    computed_quantities[q](dim + 1) = Equations<EquationsTypeMhd, dim>::compute_magnetic_field_divergence(duh[q]);
+    computed_quantities[q](3) = Equations<EquationsTypeMhd, dim>::compute_pressure(uh_q, parameters);
+    computed_quantities[q](3 + 1) = Equations<EquationsTypeMhd, dim>::compute_magnetic_field_divergence(duh[q]);
     auto curl_ = Equations<EquationsTypeMhd, dim>::compute_magnetic_field_curl(duh[q]);
-    for (unsigned int d = 0; d < dim; ++d)
-      computed_quantities[q](dim + 2 + d) = curl_[d];
+    for (unsigned int d = 0; d < 3; ++d)
+      computed_quantities[q](3 + 2 + d) = curl_[d];
   }
 }
 #endif
@@ -230,12 +216,14 @@ std::vector<std::string> Equations<EquationsTypeMhd, dim>::Postprocessor::get_na
 template <int dim>
 std::vector<DataComponentInterpretation::DataComponentInterpretation> Equations<EquationsTypeMhd, dim>::Postprocessor::get_data_component_interpretation() const
 {
-  std::vector<DataComponentInterpretation::DataComponentInterpretation> interpretation(dim, DataComponentInterpretation::component_is_part_of_vector);
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>   interpretation;
   interpretation.push_back(DataComponentInterpretation::component_is_scalar);
   interpretation.push_back(DataComponentInterpretation::component_is_scalar);
-  interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-  interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-  interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+  interpretation.push_back(DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back(DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back(DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back(DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back(DataComponentInterpretation::component_is_scalar);
 
   return interpretation;
 }
@@ -246,4 +234,4 @@ UpdateFlags Equations<EquationsTypeMhd, dim>::Postprocessor::get_needed_update_f
   return update_values | update_gradients;
 }
 
-template class Equations<EquationsTypeMhd, 3>;
+template class Equations<EquationsTypeMhd, 2>;

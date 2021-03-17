@@ -30,4 +30,4 @@ void InitialConditionMhdBlast<equationsType, dim>::vector_value(const std::vecto
   }
 }
 
-template class InitialConditionMhdBlast<EquationsTypeMhd, 3>;
+template class InitialConditionMhdBlast<EquationsTypeMhd, 2>;

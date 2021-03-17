@@ -6,7 +6,7 @@
 #include "parameters.h"
 
 // Dimension of the problem - passed as a template parameter to pretty much every class.
-#define DIMENSION 3
+#define DIMENSION 2
 // Type of equations, must be from the enumeration EquationsType defined in equations.h.
 #define EQUATIONS EquationsTypeMhd
 
@@ -26,25 +26,25 @@ void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMEN
 
 void set_parameters(Parameters<DIMENSION>& parameters)
 {
-    parameters.corner_a = Point<DIMENSION>(-0.5, -0.75, 0.);
-    parameters.corner_b = Point<DIMENSION>(0.5, 0.75, 1. / 50.);
-    parameters.refinements = { 25, 32, 1 };
+    parameters.corner_a = Point<DIMENSION>(-0.5, -0.75);
+    parameters.corner_b = Point<DIMENSION>(0.5, 0.75);
+    parameters.refinements = { 25, 32 };
     parameters.limit = true;
     parameters.limitB = false;
     parameters.limit_edges_and_vertices = true;
-    parameters.output_file_prefix = "blast";
+    parameters.output_file_prefix = "mhd-blast";
     parameters.slope_limiter = parameters.vertexBased;
     parameters.use_div_free_space_for_B = false;
-    parameters.periodic_boundaries = { { 0, 1, 0 },{ 2, 3, 1 } };
-    parameters.num_flux_type = Parameters<DIMENSION>::hlld;
-    parameters.lax_friedrich_stabilization_value = 0.75;
+    parameters.periodic_boundaries = {{ 0, 1, 0 }};
+    parameters.num_flux_type = Parameters<DIMENSION>::lax_friedrich;
+    parameters.lax_friedrich_stabilization_value = 0.5;
     parameters.cfl_coefficient = .05;
     parameters.quadrature_order = 5;
     parameters.polynomial_order_dg = 1;
     parameters.patches = 0;
-    parameters.output_step = 1.e-2;
+    parameters.output_step = 1.e-3;
     parameters.final_time = .5;
-    parameters.debug = parameters.BasicSteps;// | parameters.Adaptivity | parameters.PeriodicBoundaries | parameters.Assembling;
+    parameters.debug = parameters.Adaptivity; // | parameters.BasicSteps | parameters.PeriodicBoundaries;// | parameters.Assembling;
 
     /*
     parameters.output_matrix = true;
@@ -52,12 +52,12 @@ void set_parameters(Parameters<DIMENSION>& parameters)
     parameters.output_solution = true;
     */
 
-    parameters.max_cells = 1000;
-    parameters.refine_every_nth_time_step = 5;
-    parameters.perform_n_initial_refinements = 5;
-    parameters.refine_threshold = 0.3;
+    parameters.max_cells = 500;
+    parameters.refine_every_nth_time_step = 10;
+    parameters.perform_n_initial_refinements = 10;
+    parameters.refine_threshold = 0.5;
     parameters.coarsen_threshold = 0.2;
-    parameters.volume_factor = 3;
+    parameters.volume_factor = 2;
     parameters.time_interval_max_cells_multiplicator = 1.;
 }
 
@@ -114,10 +114,10 @@ int main(int argc, char *argv[])
     // Declaration of triangulation. The triangulation is not initialized here, but rather in the constructor of Parameters class.
 #ifdef HAVE_MPI
   
-    parallel::distributed::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices | Triangulation<DIMENSION>::allow_anisotropic_smoothing));
+    parallel::distributed::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices));
     
 #else
-    Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::allow_anisotropic_smoothing);
+    Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::MeshSmoothing::maximum_smoothing);
     
 #endif
    

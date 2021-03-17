@@ -439,7 +439,7 @@ Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, cons
           if (!is_primitive[i])
           {
             Tensor<1, dim> fe_v_value_neighbor = fe_v_neighbor[mag].value(i, q);
-            for (int d = 0; d < dim; d++)
+            for (int d = 0; d < dim; d++) //?
               Wminus_old[q][5 + d] += prev_solution(dof_indices_neighbor[i]) * fe_v_value_neighbor[d];
           }
           else
@@ -462,7 +462,7 @@ Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, cons
     {
       LOG(0, "point_i: " << q);
 
-      LOG(1, "q: " << fe_v.quadrature_point(q) << ", n: " << fe_v.normal_vector(q)[0] << ", " << fe_v.normal_vector(q)[1] << ", " << fe_v.normal_vector(q)[2]);
+      LOG(1, "q: " << fe_v.quadrature_point(q) << ", n: " << fe_v.normal_vector(q)[0] << ", " << fe_v.normal_vector(q)[1] );
       LOG(1, "Wplus: ");
       for (unsigned int i = 0; i < Equations<equationsType, dim>::n_components; i++)
         LOG(0, Wplus_old[q][i] << (i < 7 ? ", " : ""));
@@ -585,7 +585,7 @@ void Problem<equationsType, dim>::output_base()
 
     static unsigned int output_file_number_base = 0;
 
-    std::string filename = "solution-" + Utilities::int_to_string(output_file_number_base, 3) + ".vtk";
+    std::string filename = "solution-" + Utilities::int_to_string(output_file_number_base, 2) + ".vtk";
     std::ofstream output(filename.c_str());
     data_out.write_vtk(output);
 
@@ -605,7 +605,7 @@ void Problem<equationsType, dim>::output_results(bool use_prev_solution) const
   data_out.add_data_vector(use_prev_solution ? prev_solution : current_limited_solution, equations.component_names(), DataOut<dim>::type_dof_data, equations.component_interpretation());
 
   // Derived quantities.
-  data_out.add_data_vector(use_prev_solution ? prev_solution : current_limited_solution, postprocessor);
+//  data_out.add_data_vector(use_prev_solution ? prev_solution : current_limited_solution, postprocessor);
 
 #ifdef HAVE_MPI
   // Subdomains.
@@ -640,7 +640,7 @@ void Problem<equationsType, dim>::output_results(bool use_prev_solution) const
     data_out.write_pvtu_record(visit_master_output, filenames);
   }
 #else
-  std::string filename = (parameters.output_file_prefix.length() > 0 ? parameters.output_file_prefix : (use_prev_solution ? "prev_solution" : "solution")) + "-" + Utilities::int_to_string(output_file_number, 3) + ".vtk";
+  std::string filename = (parameters.output_file_prefix.length() > 0 ? parameters.output_file_prefix : (use_prev_solution ? "prev_solution" : "solution")) + "-" + Utilities::int_to_string(output_file_number, 2) + ".vtk";
   std::ofstream output(filename.c_str());
   data_out.write_vtk(output);
 #endif
@@ -828,4 +828,4 @@ void Problem<equationsType, dim>::move_time_step_handle_outputs()
   }
 }
 
-template class Problem<EquationsTypeMhd, 3>;
+template class Problem<EquationsTypeMhd, 2>;

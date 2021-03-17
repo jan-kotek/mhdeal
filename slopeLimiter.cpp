@@ -368,6 +368,6 @@ void BarthJespersenSlopeLimiter<equationsType, dim>::postprocess(TrilinosWrapper
   }
 }
 
-template class SlopeLimiter<EquationsTypeMhd, 3>;
-template class VertexBasedSlopeLimiter<EquationsTypeMhd, 3>;
-template class BarthJespersenSlopeLimiter<EquationsTypeMhd, 3>;
+template class SlopeLimiter<EquationsTypeMhd, 2>;
+template class VertexBasedSlopeLimiter<EquationsTypeMhd, 2>;
+template class BarthJespersenSlopeLimiter<EquationsTypeMhd, 2>;

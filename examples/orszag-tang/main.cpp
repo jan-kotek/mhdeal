@@ -5,7 +5,7 @@
 #include "initialConditionOT.h"
 
 // Dimension of the problem - passed as  template parameter to pretty much every class.
-#define DIMENSION 3
+#define DIMENSION 2
 // Type of equations, must be from the enumeration EquationsType defined in equations.h.
 #define EQUATIONS EquationsTypeMhd
 
@@ -26,13 +26,13 @@ void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMEN
 void set_parameters(Parameters<DIMENSION>& parameters)  
 {
   parameters.slope_limiter = parameters.vertexBased;
-  parameters.corner_a = Point<DIMENSION>(0., 0., 0.);
-  parameters.corner_b = Point<DIMENSION>(1., 1., 0.001);
-  parameters.refinements = { 200, 200, 1 };
+  parameters.corner_a = Point<DIMENSION>(0., 0.);
+  parameters.corner_b = Point<DIMENSION>(1., 1.);
+  parameters.refinements = { 100, 100};
   parameters.limit = false;
-  parameters.use_div_free_space_for_B = true;
-  parameters.periodic_boundaries = { { 0, 1, 0 },{ 2, 3, 1 } };
-  parameters.num_flux_type = Parameters<DIMENSION>::hlld;
+  parameters.use_div_free_space_for_B = false;
+  parameters.periodic_boundaries = { { 0, 1, 0} };
+  parameters.num_flux_type = Parameters<DIMENSION>::lax_friedrich;
   parameters.lax_friedrich_stabilization_value = 0.5;
   parameters.cfl_coefficient = .05;
   parameters.start_limiting_at = .05;
@@ -41,7 +41,7 @@ void set_parameters(Parameters<DIMENSION>& parameters)
   parameters.patches = 0;
   parameters.output_step = 2.e-2;
   parameters.final_time = .5;
-  parameters.debug = parameters.Adaptivity;
+  //parameters.debug =  parameters.BasicSteps;// | parameters.PeriodicBoundaries | parameters.Assembling;
 }
 
 int main(int argc, char *argv[])

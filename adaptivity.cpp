@@ -5,4 +5,4 @@ Adaptivity<dim>::Adaptivity(Parameters<dim>& parameters, MPI_Comm& mpi_communica
   parameters(parameters), mpi_communicator(mpi_communicator)
 { }
 
-template class Adaptivity<3>;
+template class Adaptivity<2>;

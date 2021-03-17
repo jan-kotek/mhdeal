@@ -29,4 +29,4 @@ void InitialConditionOT<equationsType, dim>::vector_value(const std::vector<Poin
   }
 }
 
-template class InitialConditionOT<EquationsTypeMhd, 3>;
+template class InitialConditionOT<EquationsTypeMhd, 2>;
