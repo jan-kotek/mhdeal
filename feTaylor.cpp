@@ -463,4 +463,5 @@ unsigned int FE_DG_Taylor<dim, spacedim>::get_degree() const
   return this->degree;
 }
 
-template class FE_DG_Taylor<3>;
+
+template class FE_DG_Taylor<2>;

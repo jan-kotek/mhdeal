@@ -7,4 +7,4 @@ InitialCondition<equationsType, dim>::InitialCondition(Parameters<dim>& paramete
 {
 };
 
-template class InitialCondition<EquationsTypeMhd, 3>;
+template class InitialCondition<EquationsTypeMhd, 2>;

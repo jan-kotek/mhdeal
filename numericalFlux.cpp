@@ -26,18 +26,7 @@ void NumFlux<equationsType, dim>::Q(n_comp_array &result, const n_comp_array &W,
     forResult[5] = -W[6];
     forResult[6] = W[5];
   }
-  else if (normal[2] > 0.5) {
-    forResult[1] = W[3];
-    forResult[3] = -W[1];
-    forResult[5] = W[7];
-    forResult[7] = -W[5];
-  }
-  else if (normal[2] < -0.5) {
-    forResult[1] = -W[3];
-    forResult[3] = W[1];
-    forResult[5] = -W[7];
-    forResult[7] = W[5];
-  }
+
 
   for (unsigned int d = 0; d < n_comp; d++)
     result[d] = forResult[d];
@@ -69,18 +58,7 @@ void NumFlux<equationsType, dim>::Q_inv(n_comp_array &result, n_comp_array &W, c
     forResult[5] = W[6];
     forResult[6] = -W[5];
   }
-  else if (normal[2] > 0.5) {
-    forResult[1] = -W[3];
-    forResult[3] = W[1];
-    forResult[5] = -W[7];
-    forResult[7] = W[5];
-  }
-  else if (normal[2] < -0.5) {
-    forResult[1] = W[3];
-    forResult[3] = -W[1];
-    forResult[5] = W[7];
-    forResult[7] = -W[5];
-  }
+  
   for (unsigned int d = 0; d < n_comp; d++)
     result[d] = forResult[d];
 }
@@ -441,6 +419,6 @@ void NumFluxHLLD<equationsType, dim>::numerical_normal_flux(const Tensor<1, dim>
   exit(1);
 }
 
-template class NumFlux<EquationsTypeMhd, 3>;
-template class NumFluxLaxFriedrich<EquationsTypeMhd, 3>;
-template class NumFluxHLLD<EquationsTypeMhd, 3>;
+template class NumFlux<EquationsTypeMhd, 2>;
+template class NumFluxLaxFriedrich<EquationsTypeMhd, 2>;
+template class NumFluxHLLD<EquationsTypeMhd, 2>;

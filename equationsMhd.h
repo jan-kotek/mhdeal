@@ -8,7 +8,7 @@ template <int dim>
 class Equations<EquationsTypeMhd, dim>
 {
 public:
-  static const unsigned int n_components = 2 * dim + 2;
+  static const unsigned int n_components = 8;
 
   typedef std::array<double, n_components> values_vector;
 
@@ -28,7 +28,7 @@ public:
   static double compute_energy_from_pressure(const values_vector &W, const double& pressure, const Parameters<dim>& parameters);
 
   static double compute_magnetic_field_divergence(const std::vector<Tensor<1, dim> > &W);
-  static std::array<double, dim> compute_magnetic_field_curl(const std::vector<Tensor<1, dim> > &W);
+  static std::array<double, 3> compute_magnetic_field_curl(const std::vector<Tensor<1, dim> > &W);
 
   // Compute the matrix of MHD fluxes.
   static void compute_flux_matrix(const values_vector &W, std::array <std::array <double, dim>, n_components > &flux, const Parameters<dim>& parameters);

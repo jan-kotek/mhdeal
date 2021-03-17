@@ -75,4 +75,4 @@ bool Parameters<dim>::is_periodic_boundary(int boundary_id) const
   return false;
 }
 
-template class Parameters<3>;
+template class Parameters<2>;

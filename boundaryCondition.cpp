@@ -2,7 +2,7 @@
 #include "equationsMhd.h"
 
 template<>
-BoundaryCondition<EquationsTypeMhd, 3>::BoundaryCondition(Parameters<3>& parameters) : parameters(parameters) {};
+BoundaryCondition<EquationsTypeMhd, 2>::BoundaryCondition(Parameters<2>& parameters) : parameters(parameters) {};
 
 template <EquationsType equationsType, int dim>
 void BoundaryCondition<equationsType, dim>::bc_vector_value(int boundary_no, const Point<dim> &point, const Tensor<1, dim> &normal, 
@@ -12,4 +12,4 @@ void BoundaryCondition<equationsType, dim>::bc_vector_value(int boundary_no, con
     result[di] = W_plus[di];
 }
 
-template class BoundaryCondition<EquationsTypeMhd, 3>;
+template class BoundaryCondition<EquationsTypeMhd, 2>;

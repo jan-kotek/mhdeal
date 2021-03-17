@@ -245,7 +245,7 @@ FE_DG_DivFree<dim, spacedim>::shape_grad_component(const typename Triangulation<
 {
   // TODO: Use extent_in_direction() & mapping instead of diameter()
   const double h = cell->diameter();
-  Tensor<1, dim> grad({ 0., 0., 0. });
+  Tensor<1, dim> grad({ 0., 0. });
   switch (i) {
   case 3:
     switch (component) {
@@ -596,4 +596,4 @@ std::string FE_DG_DivFree<dim, spacedim>::get_name() const
   return namebuf.str();
 }
 
-template class FE_DG_DivFree<3>;
+template class FE_DG_DivFree<2>;

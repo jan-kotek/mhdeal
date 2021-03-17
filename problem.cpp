@@ -585,7 +585,7 @@ void Problem<equationsType, dim>::output_base()
 
     static unsigned int output_file_number_base = 0;
 
-    std::string filename = "solution-" + Utilities::int_to_string(output_file_number_base, 3) + ".vtk";
+    std::string filename = "solution-" + Utilities::int_to_string(output_file_number_base, 2) + ".vtk";
     std::ofstream output(filename.c_str());
     data_out.write_vtk(output);
 
@@ -605,7 +605,7 @@ void Problem<equationsType, dim>::output_results(bool use_prev_solution) const
   data_out.add_data_vector(use_prev_solution ? prev_solution : current_limited_solution, equations.component_names(), DataOut<dim>::type_dof_data, equations.component_interpretation());
 
   // Derived quantities.
-  data_out.add_data_vector(use_prev_solution ? prev_solution : current_limited_solution, postprocessor);
+//  data_out.add_data_vector(use_prev_solution ? prev_solution : current_limited_solution, postprocessor);
 
 #ifdef HAVE_MPI
   // Subdomains.
@@ -640,7 +640,7 @@ void Problem<equationsType, dim>::output_results(bool use_prev_solution) const
     data_out.write_pvtu_record(visit_master_output, filenames);
   }
 #else
-  std::string filename = (parameters.output_file_prefix.length() > 0 ? parameters.output_file_prefix : (use_prev_solution ? "prev_solution" : "solution")) + "-" + Utilities::int_to_string(output_file_number, 3) + ".vtk";
+  std::string filename = (parameters.output_file_prefix.length() > 0 ? parameters.output_file_prefix : (use_prev_solution ? "prev_solution" : "solution")) + "-" + Utilities::int_to_string(output_file_number, 2) + ".vtk";
   std::ofstream output(filename.c_str());
   data_out.write_vtk(output);
 #endif
@@ -828,4 +828,4 @@ void Problem<equationsType, dim>::move_time_step_handle_outputs()
   }
 }
 
-template class Problem<EquationsTypeMhd, 3>;
+template class Problem<EquationsTypeMhd, 2>;

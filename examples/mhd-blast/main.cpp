@@ -2,11 +2,11 @@
 #include "problem.h"
 #include "equationsMhd.h"
 #include "initialConditionMhdBlast.h"
-#include "adaptivityMhdBlast.h"
+//#include "adaptivityMhdBlast.h"
 #include "parameters.h"
 
 // Dimension of the problem - passed as a template parameter to pretty much every class.
-#define DIMENSION 3
+#define DIMENSION 2
 // Type of equations, must be from the enumeration EquationsType defined in equations.h.
 #define EQUATIONS EquationsTypeMhd
 
@@ -26,17 +26,17 @@ void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMEN
 
 void set_parameters(Parameters<DIMENSION>& parameters)
 {
-    parameters.corner_a = Point<DIMENSION>(-0.5, -0.75, 0.);
-    parameters.corner_b = Point<DIMENSION>(0.5, 0.75, 1. / 50.);
-    parameters.refinements = { 25, 32, 1 };
-    parameters.limit = true;
+    parameters.corner_a = Point<DIMENSION>(-0.5, -0.75);
+    parameters.corner_b = Point<DIMENSION>(0.5, 0.75);
+    parameters.refinements = { 25, 32 };
+    parameters.limit = false;
     parameters.limitB = false;
-    parameters.limit_edges_and_vertices = true;
+    parameters.limit_edges_and_vertices = false;
     parameters.output_file_prefix = "blast";
     parameters.slope_limiter = parameters.vertexBased;
     parameters.use_div_free_space_for_B = false;
-    parameters.periodic_boundaries = { { 0, 1, 0 },{ 2, 3, 1 } };
-    parameters.num_flux_type = Parameters<DIMENSION>::hlld;
+    parameters.periodic_boundaries = {{ 0, 1, 0 }};
+    parameters.num_flux_type = Parameters<DIMENSION>::lax_friedrich;
     parameters.lax_friedrich_stabilization_value = 0.75;
     parameters.cfl_coefficient = .05;
     parameters.quadrature_order = 5;
@@ -114,10 +114,10 @@ int main(int argc, char *argv[])
     // Declaration of triangulation. The triangulation is not initialized here, but rather in the constructor of Parameters class.
 #ifdef HAVE_MPI
   
-    parallel::distributed::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices | Triangulation<DIMENSION>::allow_anisotropic_smoothing));
+    parallel::distributed::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices));
     
 #else
-    Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::allow_anisotropic_smoothing);
+    Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::MeshSmoothing::limit_level_difference_at_vertices);
     
 #endif
    
@@ -129,11 +129,11 @@ int main(int argc, char *argv[])
     // Set up equations - see equations.h, equationsMhd.h
     Equations<EQUATIONS, DIMENSION> equations;
     // Adaptivity
-    AdaptivityMhdBlast<DIMENSION> adaptivity(parameters, mpi_communicator);
+    //AdaptivityMhdBlast<DIMENSION> adaptivity(parameters, mpi_communicator);
     // Put together the problem.
     Problem<EQUATIONS, DIMENSION> problem(parameters, equations, triangulation, initial_condition, boundary_conditions);
     // Set adaptivity
-    problem.set_adaptivity(&adaptivity);
+    //problem.set_adaptivity(&adaptivity);
     // Run the problem - entire transient problem.
     problem.run();
   }

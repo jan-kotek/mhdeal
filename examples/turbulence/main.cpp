@@ -27,12 +27,12 @@ void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMEN
 void set_parameters(Parameters<DIMENSION>& parameters)  
 {
   parameters.slope_limiter = parameters.vertexBased;
-  parameters.corner_a = Point<DIMENSION>(-5., -5., 0.);
-  parameters.corner_b = Point<DIMENSION>(5., 5., 0.001);
-  parameters.refinements = { 200, 200, 1 };
+  parameters.corner_a = Point<DIMENSION>(-5., -5.);
+  parameters.corner_b = Point<DIMENSION>(5., 5.);
+  parameters.refinements = { 200, 200};
   parameters.limit = true;
   parameters.use_div_free_space_for_B = true;
-  parameters.periodic_boundaries = { { 0, 1, 0 },{ 2, 3, 1 } };
+  parameters.periodic_boundaries = { { 0, 1, 0  } };
   parameters.num_flux_type = Parameters<DIMENSION>::hlld;
   parameters.lax_friedrich_stabilization_value = 0.3;
   parameters.cfl_coefficient = .01;
