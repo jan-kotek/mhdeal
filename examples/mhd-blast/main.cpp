@@ -6,7 +6,7 @@
 #include "parameters.h"
 
 // Dimension of the problem - passed as a template parameter to pretty much every class.
-#define DIMENSION 2
+#define DIMENSION 3
 // Type of equations, must be from the enumeration EquationsType defined in equations.h.
 #define EQUATIONS EquationsTypeMhd
 
