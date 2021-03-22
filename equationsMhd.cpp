@@ -210,20 +210,22 @@ Equations<EquationsTypeMhd, dim>::Postprocessor::compute_derived_quantities_vect
 template <int dim>
 std::vector<std::string> Equations<EquationsTypeMhd, dim>::Postprocessor::get_names() const
 {
-  return{ "velocity", "velocity", "velocity", "pressure", "divB", "curlB", "curlB", "curlB" };
+  return{ "velocity", "velocity", "velocity_z", "pressure", "divB", "curlB_x", "curlB_y", "curlB_z" };
 }
 
 template <int dim>
 std::vector<DataComponentInterpretation::DataComponentInterpretation> Equations<EquationsTypeMhd, dim>::Postprocessor::get_data_component_interpretation() const
 {
     std::vector<DataComponentInterpretation::DataComponentInterpretation>   interpretation;
+  interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+  interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
   interpretation.push_back(DataComponentInterpretation::component_is_scalar);
   interpretation.push_back(DataComponentInterpretation::component_is_scalar);
   interpretation.push_back(DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+  interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
   interpretation.push_back(DataComponentInterpretation::component_is_scalar);
-  interpretation.push_back(DataComponentInterpretation::component_is_scalar);
-  interpretation.push_back(DataComponentInterpretation::component_is_scalar);
-  interpretation.push_back(DataComponentInterpretation::component_is_scalar);
+  
 
   return interpretation;
 }

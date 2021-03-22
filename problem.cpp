@@ -97,6 +97,7 @@ template <EquationsType equationsType, int dim>
 void Problem<equationsType, dim>::calculate_cfl_condition()
 {
   cfl_time_step = parameters.cfl_coefficient * GridTools::minimal_cell_diameter(this->triangulation) / this->max_signal_speed;
+  std::cout << "coef: " << parameters.cfl_coefficient << "    diam: " << GridTools::minimal_cell_diameter(this->triangulation) << "     mss:" << this->max_signal_speed<<"\n";
 }
 
 template <EquationsType equationsType, int dim>
@@ -198,6 +199,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
               neighbor_child->get_dof_indices(dof_indices_neighbor);
 
               assemble_face_term(face_no, fe_v_subface, fe_v_face_neighbor, false, numbers::invalid_unsigned_int, cell_rhs);
+           
             }
           }
           // Here the neighbor face is less split than the current one, there is some transformation needed.
@@ -238,7 +240,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
                 cell->neighbor_of_neighbor(face_no));
 
             fe_v_face_neighbor.reinit(neighbor, neighbor2);
-            assemble_face_term(face_no, fe_v_face, fe_v_face_neighbor, false, numbers::invalid_unsigned_int, cell_rhs);
+            assemble_face_term(face_no, fe_v_face, fe_v_face_neighbor, false, numbers::invalid_unsigned_int, cell_rhs);//!2
           }
         }
       }
@@ -605,7 +607,7 @@ void Problem<equationsType, dim>::output_results(bool use_prev_solution) const
   data_out.add_data_vector(use_prev_solution ? prev_solution : current_limited_solution, equations.component_names(), DataOut<dim>::type_dof_data, equations.component_interpretation());
 
   // Derived quantities.
-//  data_out.add_data_vector(use_prev_solution ? prev_solution : current_limited_solution, postprocessor);
+  data_out.add_data_vector(use_prev_solution ? prev_solution : current_limited_solution, postprocessor);
 
 #ifdef HAVE_MPI
   // Subdomains.
@@ -643,6 +645,8 @@ void Problem<equationsType, dim>::output_results(bool use_prev_solution) const
   std::string filename = (parameters.output_file_prefix.length() > 0 ? parameters.output_file_prefix : (use_prev_solution ? "prev_solution" : "solution")) + "-" + Utilities::int_to_string(output_file_number, 2) + ".vtk";
   std::ofstream output(filename.c_str());
   data_out.write_vtk(output);
+
+ 
 #endif
 
   ++output_file_number;
@@ -700,7 +704,7 @@ void Problem<equationsType, dim>::run()
       system_rhs = 0;
     if (reset_after_refinement)
       system_matrix = 0;
-    assemble_system(this->reset_after_refinement);
+    assemble_system(this->reset_after_refinement);//!
 
     // Output matrix & rhs if required.
     if (parameters.output_matrix)

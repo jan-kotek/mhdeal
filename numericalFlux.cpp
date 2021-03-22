@@ -105,7 +105,6 @@ void NumFluxLaxFriedrich<equationsType, dim>::numerical_normal_flux(const Tensor
     spd[0] = ur[1] * hr[0] - cm;
     spd[4] = ul[1] * hl[0] + cm;
   }
-
   max_speed = std::max(max_speed, (std::max(std::abs(spd[0]), std::abs(spd[4]))));
 
   std::array<std::array <double, dim>, n_comp > iflux, oflux;

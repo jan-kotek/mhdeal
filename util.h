@@ -62,6 +62,8 @@
 #include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/derivative_approximation.h>
+//#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #ifndef NEGLIGIBLE
 #define NEGLIGIBLE 1e-12
