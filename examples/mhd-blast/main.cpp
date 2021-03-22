@@ -34,7 +34,7 @@ void set_parameters(Parameters<DIMENSION>& parameters)
     parameters.limit_edges_and_vertices = true;
     parameters.output_file_prefix = "blast";
     parameters.slope_limiter = parameters.vertexBased;
-    parameters.use_div_free_space_for_B = false;
+    parameters.use_div_free_space_for_B = true;
     parameters.periodic_boundaries = { { 0, 1, 0 },{ 2, 3, 1 } };
     parameters.num_flux_type = Parameters<DIMENSION>::hlld;
     parameters.lax_friedrich_stabilization_value = 0.75;
@@ -114,10 +114,10 @@ int main(int argc, char *argv[])
     // Declaration of triangulation. The triangulation is not initialized here, but rather in the constructor of Parameters class.
 #ifdef HAVE_MPI
   
-    parallel::distributed::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices | Triangulation<DIMENSION>::allow_anisotropic_smoothing));
+    parallel::distributed::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices ));
     
 #else
-    Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::allow_anisotropic_smoothing);
+    Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::limit_level_difference_at_vertices);
     
 #endif
    
