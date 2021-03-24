@@ -136,6 +136,7 @@ public:
   std::vector<std::array<std::array<double, dim>, Equations<equationsType, dim>::n_components> > Wgrad_plus_old;
   std::vector<std::array<double, Equations<equationsType, dim>::n_components> > normal_fluxes_old;
   std::vector<std::array<double, Equations<equationsType, dim>::n_components> > W_prev;
+  std::vector<std::array<double, Equations<equationsType, dim>::n_components> > Bcurl;//
   std::vector<std::array<std::array<double, dim>, Equations<equationsType, dim>::n_components> > fluxes_old;
 
   std::array <unsigned short, BASIS_FN_COUNT> component_ii;

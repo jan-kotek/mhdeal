@@ -81,37 +81,42 @@ std::array<double, dim> Equations<EquationsTypeMhd, dim>::compute_magnetic_field
 }
 
 template <int dim>
-void Equations<EquationsTypeMhd, dim>::compute_flux_matrix(const values_vector &W, std::array <std::array <double, dim>, n_components > &flux, const Parameters<dim>& parameters)
+void Equations<EquationsTypeMhd, dim>::compute_flux_matrix(const values_vector &W, std::array <std::array <double, dim>, n_components > &flux, const Parameters<dim>& parameters, double resistivity)
 {
   const double total_pressure = compute_total_pressure(W, parameters);
   const double oneOverRho = 1. / W[0];
   const double UB = (W[1] * W[5] + W[2] * W[6] + W[3] * W[7])* oneOverRho;
-
+  //const std::array<double, dim> JR = compute_magnetic_field_curl(W);//eclectric current*resistivity
+  //const double div= compute_magnetic_field_divergence(W);
+  // 
+  //Vector JR=rezistivita * rotB;//indexy 0,1,2 - x,y,z
+  
+  
   flux[0][0] = W[1];
   flux[1][0] = (W[1] * W[1] * oneOverRho) - W[5] * W[5] + total_pressure;
   flux[2][0] = (W[1] * W[2] * oneOverRho) - W[5] * W[6];
   flux[3][0] = (W[1] * W[3] * oneOverRho) - W[5] * W[7];
-  flux[4][0] = (W[4] + total_pressure) * (W[1] * oneOverRho) - (W[5] * UB);
+  flux[4][0] = (W[4] + total_pressure) * (W[1] * oneOverRho) - (W[5] * UB);//JR[1]*W[7]-JR[2]*W[6]
   flux[5][0] = 0.0;
-  flux[6][0] = ((W[1] * oneOverRho) * W[6]) - ((W[2] * oneOverRho) * W[5]);
-  flux[7][0] = ((W[1] * oneOverRho) * W[7]) - ((W[3] * oneOverRho) * W[5]);
+  flux[6][0] = ((W[1] * oneOverRho) * W[6]) - ((W[2] * oneOverRho) * W[5]);// -JR[2]
+  flux[7][0] = ((W[1] * oneOverRho) * W[7]) - ((W[3] * oneOverRho) * W[5]);// +JR[1]
 
   flux[0][1] = W[2];
   flux[1][1] = (W[2] * W[1] * oneOverRho) - W[6] * W[5];
   flux[2][1] = (W[2] * W[2] * oneOverRho) - W[6] * W[6] + total_pressure;
   flux[3][1] = (W[2] * W[3] * oneOverRho) - W[6] * W[7];
-  flux[4][1] = (W[4] + total_pressure) * (W[2] * oneOverRho) - (W[6] * UB);
-  flux[5][1] = ((W[2] * oneOverRho) * W[5]) - ((W[1] * oneOverRho) * W[6]);
+  flux[4][1] = (W[4] + total_pressure) * (W[2] * oneOverRho) - (W[6] * UB);//-JR[0]*W[6]+JR[2]*W[5]
+  flux[5][1] = ((W[2] * oneOverRho) * W[5]) - ((W[1] * oneOverRho) * W[6]);//+JR[2]
   flux[6][1] = 0.0;
-  flux[7][1] = ((W[2] * oneOverRho) * W[7]) - ((W[3] * oneOverRho) * W[6]);
+  flux[7][1] = ((W[2] * oneOverRho) * W[7]) - ((W[3] * oneOverRho) * W[6]);//-JR[0]
 
   flux[0][2] = W[3];
   flux[1][2] = (W[3] * W[1] * oneOverRho) - W[7] * W[5];
   flux[2][2] = (W[3] * W[2] * oneOverRho) - W[7] * W[6];
   flux[3][2] = (W[3] * W[3] * oneOverRho) - W[7] * W[7] + total_pressure;
-  flux[4][2] = (W[4] + total_pressure) * (W[3] * oneOverRho) - (W[7] * UB);
-  flux[5][2] = ((W[3] * oneOverRho) * W[5]) - ((W[1] * oneOverRho) * W[7]);
-  flux[6][2] = ((W[3] * oneOverRho) * W[6]) - ((W[2] * oneOverRho) * W[7]);
+  flux[4][2] = (W[4] + total_pressure) * (W[3] * oneOverRho) - (W[7] * UB);//-JR[1]*W[5]+JR[0]*W[6]
+  flux[5][2] = ((W[3] * oneOverRho) * W[5]) - ((W[1] * oneOverRho) * W[7]);//-JR[1]
+  flux[6][2] = ((W[3] * oneOverRho) * W[6]) - ((W[2] * oneOverRho) * W[7]);//+JR[0]
   flux[7][2] = 0.0;
 }
 

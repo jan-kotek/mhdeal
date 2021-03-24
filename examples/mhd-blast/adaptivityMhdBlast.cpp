@@ -145,23 +145,15 @@ bool AdaptivityMhdBlast<dim>::refine_mesh(int time_step, double time, TrilinosWr
 //The following is tricky but usefull for anisotropic mesh refinement (eg solving 2D problem in 3D)
 //CANT WORK WITH distributed MESH !! (fundamental dealii limitation) 
  //aditionally mesh smoothing in declaration of Triangulation class must be properly set
-#ifdef HAVE_MPI
-#else
- // return true;
-  std::cout << triangulation.get_anisotropic_refinement_flag() << "-ARF ";
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
-      if (cell->refine_flag_set())
-          cell->set_refine_flag(RefinementCase<3>::cut_xy);
+ // return true;
+  
 
 
   triangulation.prepare_coarsening_and_refinement();
 
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
-      if (cell->refine_flag_set())
-          cell->set_refine_flag(RefinementCase<3>::cut_xy);
-#endif
+
 
 
 

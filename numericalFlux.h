@@ -17,7 +17,7 @@ public:
 
   // Compute the values for the numerical flux
   virtual void numerical_normal_flux(const Tensor<1, dim> &normal, const n_comp_array &Wplus,
-    const n_comp_array &Wminus, n_comp_array &normal_flux, double& max_speed) const = 0;
+    const n_comp_array &Wminus, n_comp_array &normal_flux, double& max_speed, double resistivity) const = 0;
 protected:
   Parameters<dim>& parameters;
 };
@@ -28,7 +28,7 @@ class NumFluxLaxFriedrich : public NumFlux<equationsType, dim>
 public:
   NumFluxLaxFriedrich(Parameters<dim>& parameters) : NumFlux<equationsType, dim>(parameters) {};
   void numerical_normal_flux(const Tensor<1, dim> &normal, const n_comp_array &Wplus,
-    const n_comp_array &Wminus, n_comp_array &normal_flux, double& max_speed) const;
+    const n_comp_array &Wminus, n_comp_array &normal_flux, double& max_speed, double resistivity) const;
 };
 
 template <EquationsType equationsType, int dim>
@@ -37,7 +37,7 @@ class NumFluxHLLD : public NumFlux<equationsType, dim>
 public:
   NumFluxHLLD(Parameters<dim>& parameters) : NumFlux<equationsType, dim>(parameters) {};
   void numerical_normal_flux(const Tensor<1, dim> &normal, const n_comp_array &Wplus,
-    const n_comp_array &Wminus, n_comp_array &normal_flux, double& max_speed) const;
+    const n_comp_array &Wminus, n_comp_array &normal_flux, double& max_speed, double resistivity) const;
 };
 
 #endif

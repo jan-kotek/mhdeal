@@ -87,7 +87,7 @@ void NumFlux<equationsType, dim>::Q_inv(n_comp_array &result, n_comp_array &W, c
 
 template <EquationsType equationsType, int dim>
 void NumFluxLaxFriedrich<equationsType, dim>::numerical_normal_flux(const Tensor<1, dim> &normal, const n_comp_array &Wplus_,
-  const n_comp_array &Wminus_, n_comp_array &normal_flux, double& max_speed) const
+  const n_comp_array &Wminus_, n_comp_array &normal_flux, double& max_speed, double resistivity) const
 {
   double hl[2], hr[2], spd[5];
 
@@ -132,8 +132,8 @@ void NumFluxLaxFriedrich<equationsType, dim>::numerical_normal_flux(const Tensor
 
   std::array<std::array <double, dim>, n_comp > iflux, oflux;
 
-  Equations<equationsType, dim>::compute_flux_matrix(Wplus_, iflux, this->parameters);
-  Equations<equationsType, dim>::compute_flux_matrix(Wminus_, oflux, this->parameters);
+  Equations<equationsType, dim>::compute_flux_matrix(Wplus_, iflux, this->parameters,resistivity);//resistivity!
+  Equations<equationsType, dim>::compute_flux_matrix(Wminus_, oflux, this->parameters,resistivity);//resistivity!
 
   for (unsigned int di = 0; di < n_comp; ++di)
   {
@@ -147,13 +147,13 @@ void NumFluxLaxFriedrich<equationsType, dim>::numerical_normal_flux(const Tensor
 
 template <EquationsType equationsType, int dim>
 void NumFluxHLLD<equationsType, dim>::numerical_normal_flux(const Tensor<1, dim> &normal, const n_comp_array &Wplus_,
-  const n_comp_array &Wminus_, n_comp_array &normal_flux, double& max_speed) const
+  const n_comp_array &Wminus_, n_comp_array &normal_flux, double& max_speed,double resistivity) const
 {
   n_comp_array flux_lf;
   if (this->parameters.debug & this->parameters.NumFlux)
   {
     NumFluxLaxFriedrich<equationsType, dim> lf(this->parameters);
-    lf.numerical_normal_flux(normal, Wplus_, Wminus_, flux_lf, max_speed);
+    lf.numerical_normal_flux(normal, Wplus_, Wminus_, flux_lf, max_speed,resistivity);
   }
 
   double Fl[n_comp], Fr[n_comp], hl[2], hr[2];

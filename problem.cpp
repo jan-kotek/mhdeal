@@ -97,6 +97,8 @@ template <EquationsType equationsType, int dim>
 void Problem<equationsType, dim>::calculate_cfl_condition()
 {
   cfl_time_step = parameters.cfl_coefficient * GridTools::minimal_cell_diameter(this->triangulation) / this->max_signal_speed;
+  std::cout << " cfl:" << cfl_time_step << " cell_d:" << GridTools::minimal_cell_diameter(this->triangulation) << " mss:" << this->max_signal_speed << "\n";
+  
 }
 
 template <EquationsType equationsType, int dim>
@@ -131,6 +133,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
   // Local (cell) matrices and rhs - for the currently assembled element and the neighbor
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double> cell_rhs(dofs_per_cell);
+  
 
   // Loop through all cells.
   int ith_cell = 0;
@@ -147,10 +150,12 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
     cell_rhs = 0;
 
     cell->get_dof_indices(dof_indices);
-
+    
     if (parameters.debug & parameters.DetailSteps)
       LOGL(2, "Cell: " << ith_cell);
     ith_cell++;
+    
+ 
 
     // Assemble the volumetric integrals.
     assemble_cell_term(cell_matrix, cell_rhs, assemble_matrix);
@@ -355,14 +360,22 @@ Problem<equationsType, dim>::assemble_cell_term(FullMatrix<double>& cell_matrix,
 
   //if (time_step_number > 0)
   {
-    for (unsigned int q = 0; q < n_quadrature_points_cell; ++q)
-      equations.compute_flux_matrix(W_prev[q], fluxes_old[q], this->parameters);
+
+    double resistivity = 0.;
+    for (unsigned int q = 0; q < n_quadrature_points_cell; ++q)[]
+    {
+        //double div = fe_v_cell[mag].divergence(q);
+        //std::cout << " /div:" << div;
+        resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));//setting resistivity
+        equations.compute_flux_matrix(W_prev[q], fluxes_old[q], this->parameters, resistivity);
+    }
 
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
     {
       double val = 0.;
       for (unsigned int q = 0; q < n_quadrature_points_cell; ++q)
       {
+
         if (is_primitive[i])
         {
           if (!basis_fn_is_constant[i])
@@ -372,6 +385,7 @@ Problem<equationsType, dim>::assemble_cell_term(FullMatrix<double>& cell_matrix,
         else
         {
           Tensor<2, dim> fe_v_grad = fe_v_cell[mag].gradient(i, q);
+
           for (unsigned int d = 0; d < dim; d++)
             for (int e = 0; e < dim; e++)
               val += fe_v_cell.JxW(q) * parameters.current_time_step_length * fluxes_old[q][5 + d][e] * fe_v_grad[d][e];
@@ -455,7 +469,8 @@ Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, cons
       boundary_conditions.bc_vector_value(boundary_id, fe_v.quadrature_point(q), fe_v.normal_vector(q), Wminus_old[q], Wgrad_plus_old[q], Wplus_old[q], this->time, this->cell);
 
     // Once we have the states on both sides of the face, we need to calculate the numerical flux.
-    this->numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed);
+    double resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
+    this->numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed, resistivity);
 
     // Some debugging outputs.
     if ((parameters.debug & parameters.Assembling) || (parameters.debug & parameters.NumFlux))
@@ -498,7 +513,8 @@ Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, cons
 
         if (std::isnan(val))
         {
-          numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed);
+          double resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
+          numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed, resistivity);
           LOG(0, ": isnan: " << val);
           LOG(0, ": i: " << i << ", ci: " << (!is_primitive[i] ? 1 : fe_v.get_fe().system_to_component_index(i).first));
           LOG(0, ": point: " << fe_v.quadrature_point(q)[0] << ", " << fe_v.quadrature_point(q)[1] << ", " << fe_v.quadrature_point(q)[2]);

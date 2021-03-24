@@ -31,7 +31,7 @@ public:
   static std::array<double, dim> compute_magnetic_field_curl(const std::vector<Tensor<1, dim> > &W);
 
   // Compute the matrix of MHD fluxes.
-  static void compute_flux_matrix(const values_vector &W, std::array <std::array <double, dim>, n_components > &flux, const Parameters<dim>& parameters);
+  static void compute_flux_matrix(const values_vector &W, std::array <std::array <double, dim>, n_components > &flux, const Parameters<dim>& parameters, double resistivity);
   static void compute_flux_vector(const Tensor<1, dim> &normal, const values_vector &W, std::array <double, n_components > &, const Parameters<dim>& parameters);
 
   // The rest is for the output.  

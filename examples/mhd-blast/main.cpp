@@ -36,7 +36,7 @@ void set_parameters(Parameters<DIMENSION>& parameters)
     parameters.slope_limiter = parameters.vertexBased;
     parameters.use_div_free_space_for_B = true;
     parameters.periodic_boundaries = { { 0, 1, 0 },{ 2, 3, 1 } };
-    parameters.num_flux_type = Parameters<DIMENSION>::hlld;
+    parameters.num_flux_type = Parameters<DIMENSION>::lax_friedrich;
     parameters.lax_friedrich_stabilization_value = 0.75;
     parameters.cfl_coefficient = .05;
     parameters.quadrature_order = 5;
@@ -44,7 +44,7 @@ void set_parameters(Parameters<DIMENSION>& parameters)
     parameters.patches = 0;
     parameters.output_step = 1.e-2;
     parameters.final_time = .5;
-    parameters.debug = parameters.BasicSteps;// | parameters.Adaptivity | parameters.PeriodicBoundaries | parameters.Assembling;
+    //parameters.debug = parameters.BasicSteps;// | parameters.Adaptivity | parameters.PeriodicBoundaries | parameters.Assembling;
 
     /*
     parameters.output_matrix = true;
@@ -52,13 +52,13 @@ void set_parameters(Parameters<DIMENSION>& parameters)
     parameters.output_solution = true;
     */
 
-    parameters.max_cells = 1000;
+    parameters.max_cells = 500;
     parameters.refine_every_nth_time_step = 5;
-    parameters.perform_n_initial_refinements = 5;
-    parameters.refine_threshold = 0.3;
+    parameters.perform_n_initial_refinements = 10;
+    parameters.refine_threshold = 0.5;
     parameters.coarsen_threshold = 0.2;
     parameters.volume_factor = 3;
-    parameters.time_interval_max_cells_multiplicator = 1.;
+    parameters.time_interval_max_cells_multiplicator = 1.00;
 }
 
 //void set_parameters(Parameters<DIMENSION>& parameters)
