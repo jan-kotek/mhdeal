@@ -39,6 +39,7 @@ Problem<equationsType, dim>::Problem(Parameters<dim>& parameters, Equations<equa
   n_quadrature_points_face = face_quadrature.get_points().size();
   Wplus_old.resize(n_quadrature_points_face);
   Wgrad_plus_old.resize(n_quadrature_points_face);
+  //Wgrad.resize(n_quadrature_points_face);
   Wminus_old.resize(n_quadrature_points_face);
   normal_fluxes_old.resize(n_quadrature_points_face);
 
@@ -133,7 +134,10 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
   // Local (cell) matrices and rhs - for the currently assembled element and the neighbor
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double> cell_rhs(dofs_per_cell);
-  
+  std::vector<Tensor<1, dim> > local_B_values(n_quadrature_points_cell);
+  std::vector<Tensor<2, dim> > local_B_grads(n_quadrature_points_cell);
+
+     
 
   // Loop through all cells.
   int ith_cell = 0;
@@ -144,6 +148,8 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
       continue;
 
     fe_v_cell.reinit(cell);
+    fe_v_cell[mag].get_function_values(prev_solution, local_B_values);
+    fe_v_cell[mag].get_function_gradients(prev_solution, local_B_grads);
 
     if (assemble_matrix)
       cell_matrix = 0;
@@ -155,7 +161,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
       LOGL(2, "Cell: " << ith_cell);
     ith_cell++;
     
- 
+   // fe_v_cell.get_function_values(prev_solution,  Wgrad);
 
     // Assemble the volumetric integrals.
     assemble_cell_term(cell_matrix, cell_rhs, assemble_matrix);
@@ -362,7 +368,7 @@ Problem<equationsType, dim>::assemble_cell_term(FullMatrix<double>& cell_matrix,
   {
 
     double resistivity = 0.;
-    for (unsigned int q = 0; q < n_quadrature_points_cell; ++q)[]
+    for (unsigned int q = 0; q < n_quadrature_points_cell; ++q)
     {
         //double div = fe_v_cell[mag].divergence(q);
         //std::cout << " /div:" << div;
@@ -463,13 +469,14 @@ Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, cons
     }
   }
 
+  double resistivity;
   for (unsigned int q = 0; q < n_quadrature_points_face; ++q)
   {
     if (external_face)
       boundary_conditions.bc_vector_value(boundary_id, fe_v.quadrature_point(q), fe_v.normal_vector(q), Wminus_old[q], Wgrad_plus_old[q], Wplus_old[q], this->time, this->cell);
 
     // Once we have the states on both sides of the face, we need to calculate the numerical flux.
-    double resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
+    resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
     this->numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed, resistivity);
 
     // Some debugging outputs.
@@ -496,6 +503,7 @@ Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, cons
     }
   }
 
+  
   for (unsigned int i = 0; i < dofs_per_cell; ++i)
   {
     if (fe_v.get_fe().has_support_on_face(i, face_no))
@@ -513,7 +521,7 @@ Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, cons
 
         if (std::isnan(val))
         {
-          double resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
+          resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
           numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed, resistivity);
           LOG(0, ": isnan: " << val);
           LOG(0, ": i: " << i << ", ci: " << (!is_primitive[i] ? 1 : fe_v.get_fe().system_to_component_index(i).first));
