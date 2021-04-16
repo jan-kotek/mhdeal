@@ -23,7 +23,7 @@ void BoundaryConditionCSWithVortices<dim>::bc_vector_value(int boundary_no, cons
     return;
   }
 
-  result[0] = std::sin(60*time)*std::sin(60 * time);//density wave
+  result[0] = 1.0;// std::sin(60 * time)* std::sin(60 * time);//density wave
   result[1] = 0;
   result[2] = 0.;
   result[3] = 0.0;

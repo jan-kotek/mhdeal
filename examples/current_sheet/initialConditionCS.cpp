@@ -30,12 +30,12 @@ void InitialConditionCS<equationsType, dim>::vector_value(const std::vector<Poin
 		//momentum density perturbation //if (p[i] < 0.5)
 		//value_list[i][1] = 0.005 * std::sin(std::rand());
 		//value_list[i][2] = 0.005 * std::sin(std::rand());
-		if (((abs(points[i][0]) < (cb[0] - 1.)) and (abs(points[i][1]) < (cb[1] - 1.))))
-		{
-			value_list[i][1] = 0.005 * dis(gen);
-			value_list[i][2] = 0.005 * dis(gen);
-		}
-		value_list[i][3] = 0.;
+		//if (((abs(points[i][0]) < (cb[0] - 1.)) and (abs(points[i][1]) < (cb[1] - 1.))))
+		//{
+		//	value_list[i][1] = 0.005 * dis(gen);
+		//	value_list[i][2] = 0.005 * dis(gen);
+		//}
+		
 
 			
 

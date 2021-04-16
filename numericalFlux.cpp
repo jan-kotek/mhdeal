@@ -87,7 +87,7 @@ void NumFlux<equationsType, dim>::Q_inv(n_comp_array &result, n_comp_array &W, c
 
 template <EquationsType equationsType, int dim>
 void NumFluxLaxFriedrich<equationsType, dim>::numerical_normal_flux(const Tensor<1, dim> &normal, const n_comp_array &Wplus_,
-  const n_comp_array &Wminus_, n_comp_array &normal_flux, double& max_speed, double resistivity) const
+  const n_comp_array &Wminus_, n_comp_array &normal_flux, double& max_speed, double resistivity, Tensor<2, dim> Bgrad) const
 {
   double hl[2], hr[2], spd[5];
 
@@ -131,9 +131,9 @@ void NumFluxLaxFriedrich<equationsType, dim>::numerical_normal_flux(const Tensor
   max_speed = std::max(max_speed, (std::max(std::abs(spd[0]), std::abs(spd[4]))));
 
   std::array<std::array <double, dim>, n_comp > iflux, oflux;
-
-  Equations<equationsType, dim>::compute_flux_matrix(Wplus_, iflux, this->parameters,resistivity);//resistivity!
-  Equations<equationsType, dim>::compute_flux_matrix(Wminus_, oflux, this->parameters,resistivity);//resistivity!
+  
+  Equations<equationsType, dim>::compute_flux_matrix(Wplus_, iflux, this->parameters,resistivity,Bgrad);//resistivity!
+  Equations<equationsType, dim>::compute_flux_matrix(Wminus_, oflux, this->parameters,resistivity,Bgrad);//resistivity!
 
   for (unsigned int di = 0; di < n_comp; ++di)
   {
@@ -144,7 +144,7 @@ void NumFluxLaxFriedrich<equationsType, dim>::numerical_normal_flux(const Tensor
     normal_flux[di] += this->parameters.lax_friedrich_stabilization_value * (Wplus_[di] - Wminus_[di]);
   }
 }
-
+/*
 template <EquationsType equationsType, int dim>
 void NumFluxHLLD<equationsType, dim>::numerical_normal_flux(const Tensor<1, dim> &normal, const n_comp_array &Wplus_,
   const n_comp_array &Wminus_, n_comp_array &normal_flux, double& max_speed,double resistivity) const
@@ -440,7 +440,7 @@ void NumFluxHLLD<equationsType, dim>::numerical_normal_flux(const Tensor<1, dim>
   }
   exit(1);
 }
-
+*/
 template class NumFlux<EquationsTypeMhd, 3>;
 template class NumFluxLaxFriedrich<EquationsTypeMhd, 3>;
-template class NumFluxHLLD<EquationsTypeMhd, 3>;
+//template class NumFluxHLLD<EquationsTypeMhd, 3>;

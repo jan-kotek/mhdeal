@@ -38,11 +38,11 @@ public:
   void calculate_cfl_condition();
 
   // Performs a local assembly for all volumetric contributions on the local cell.
-  void assemble_cell_term(FullMatrix<double>& cell_matrix, Vector<double>& cell_rhs, bool assemble_matrix);
+  void assemble_cell_term(FullMatrix<double>& cell_matrix, Vector<double>& cell_rhs, bool assemble_matrix, std::vector<Tensor<2, dim> > local_B_grads);
   
   // Performs a local assembly for all surface contributions on the local cell.
   // i.e. face terms calculated on all faces - internal and boundary
-  void assemble_face_term(const unsigned int face_no, const FEFaceValuesBase<dim> &fe_v, const FEFaceValuesBase<dim> &fe_v_neighbor, const bool external_face, const unsigned int boundary_id, Vector<double>& cell_rhs);
+  void assemble_face_term(const unsigned int face_no, const FEFaceValuesBase<dim> &fe_v, const FEFaceValuesBase<dim> &fe_v_neighbor, const bool external_face, const unsigned int boundary_id, Vector<double>& cell_rhs, std::vector<Tensor<2, dim> > local_B_grads);
   
   void output_base();
   void output_results(bool use_prev_solution = false) const;
@@ -136,7 +136,7 @@ public:
   std::vector<std::array<std::array<double, dim>, Equations<equationsType, dim>::n_components> > Wgrad_plus_old;
   std::vector<std::array<double, Equations<equationsType, dim>::n_components> > normal_fluxes_old;
   std::vector<std::array<double, Equations<equationsType, dim>::n_components> > W_prev;
-  std::vector<std::array<std::array<double, dim>, Equations<equationsType, dim>::n_components> > Wgrad;
+  //std::vector<std::array<std::array<double, dim>, Equations<equationsType, dim>::n_components> > Wgrad;
  //
   std::vector<std::array<std::array<double, dim>, Equations<equationsType, dim>::n_components> > fluxes_old;
 

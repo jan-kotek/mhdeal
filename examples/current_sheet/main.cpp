@@ -26,7 +26,7 @@ void set_parameters(Parameters<DIMENSION>& parameters, CSParameters& cs_paramete
   parameters.slope_limiter = parameters.vertexBased;
   parameters.corner_a = Point<DIMENSION>(-5, -10., 0.);
   parameters.corner_b = Point<DIMENSION>(5., 10., 0.5);
-  parameters.refinements = { 50, 100 , 1 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
+  parameters.refinements = { 200, 400 , 1 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
   parameters.limit = false;
   parameters.limitB = false;
   parameters.use_div_free_space_for_B = false;

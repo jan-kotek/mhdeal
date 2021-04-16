@@ -32,7 +32,10 @@ public:
 
   // Compute the matrix of MHD fluxes.
   static void compute_flux_matrix(const values_vector &W, std::array <std::array <double, dim>, n_components > &flux, const Parameters<dim>& parameters, double resistivity);
+  static void compute_flux_matrix(const values_vector& W, std::array <std::array <double, dim>, n_components >& flux, const Parameters<dim>& parameters, double resistivity, Tensor<2, dim> Bgrad);
   static void compute_flux_vector(const Tensor<1, dim> &normal, const values_vector &W, std::array <double, n_components > &, const Parameters<dim>& parameters);
+  static void compute_flux_vector(const Tensor<1, dim>& normal, const values_vector& W, std::array <double, n_components >&, const Parameters<dim>& parameters, double resistivity, Tensor<2, dim> Bgrad);
+
 
   // The rest is for the output.  
   class Postprocessor : public DataPostprocessor<dim>

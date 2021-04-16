@@ -43,9 +43,11 @@ Problem<equationsType, dim>::Problem(Parameters<dim>& parameters, Equations<equa
   Wminus_old.resize(n_quadrature_points_face);
   normal_fluxes_old.resize(n_quadrature_points_face);
 
-  if (parameters.num_flux_type == parameters.hlld)
+ /* if (parameters.num_flux_type == parameters.hlld)
     this->numFlux = new NumFluxHLLD<equationsType, dim>(this->parameters);
-  else if (parameters.num_flux_type == parameters.lax_friedrich)
+  
+  else if*/
+   if(parameters.num_flux_type == parameters.lax_friedrich)
     this->numFlux = new NumFluxLaxFriedrich<equationsType, dim>(this->parameters);
 
   if (parameters.slope_limiter == parameters.vertexBased)
@@ -164,7 +166,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
    // fe_v_cell.get_function_values(prev_solution,  Wgrad);
 
     // Assemble the volumetric integrals.
-    assemble_cell_term(cell_matrix, cell_rhs, assemble_matrix);
+    assemble_cell_term(cell_matrix, cell_rhs, assemble_matrix, local_B_grads);
 
     // Assemble the face integrals, only after the first (projection) step
     //if (time_step_number > 0)
@@ -179,7 +181,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
           if (parameters.debug & parameters.DetailSteps)
             LOGL(1, " - boundary");
           fe_v_face.reinit(cell, face_no);
-          assemble_face_term(face_no, fe_v_face, fe_v_face, true, cell->face(face_no)->boundary_id(), cell_rhs);
+          assemble_face_term(face_no, fe_v_face, fe_v_face, true, cell->face(face_no)->boundary_id(), cell_rhs, local_B_grads);
         }
         else
         {
@@ -208,7 +210,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
               fe_v_face_neighbor.reinit(neighbor_child, neighbor2);
               neighbor_child->get_dof_indices(dof_indices_neighbor);
 
-              assemble_face_term(face_no, fe_v_subface, fe_v_face_neighbor, false, numbers::invalid_unsigned_int, cell_rhs);
+              assemble_face_term(face_no, fe_v_subface, fe_v_face_neighbor, false, numbers::invalid_unsigned_int, cell_rhs, local_B_grads);
             }
           }
           // Here the neighbor face is less split than the current one, there is some transformation needed.
@@ -231,7 +233,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
             fe_v_face.reinit(cell, face_no);
             fe_v_subface_neighbor.reinit(neighbor, neighbor_face_no, neighbor_subface_no);
 
-            assemble_face_term(face_no, fe_v_face, fe_v_subface_neighbor, false, numbers::invalid_unsigned_int, cell_rhs);
+            assemble_face_term(face_no, fe_v_face, fe_v_subface_neighbor, false, numbers::invalid_unsigned_int, cell_rhs, local_B_grads);
           }
           // Here the neighbor face fits exactly the current face of the current element, this is the 'easy' part.
           // This is the only face assembly case performed without adaptivity.
@@ -249,7 +251,7 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
                 cell->neighbor_of_neighbor(face_no));
 
             fe_v_face_neighbor.reinit(neighbor, neighbor2);
-            assemble_face_term(face_no, fe_v_face, fe_v_face_neighbor, false, numbers::invalid_unsigned_int, cell_rhs);
+            assemble_face_term(face_no, fe_v_face, fe_v_face_neighbor, false, numbers::invalid_unsigned_int, cell_rhs, local_B_grads);
           }
         }
       }
@@ -266,8 +268,9 @@ void Problem<equationsType, dim>::assemble_system(bool assemble_matrix)
 
 template <EquationsType equationsType, int dim>
 void
-Problem<equationsType, dim>::assemble_cell_term(FullMatrix<double>& cell_matrix, Vector<double>& cell_rhs, bool assemble_matrix)
+Problem<equationsType, dim>::assemble_cell_term(FullMatrix<double>& cell_matrix, Vector<double>& cell_rhs, bool assemble_matrix, std::vector<Tensor<2, dim> > local_B_grads)
 {
+    
   if (assemble_matrix)
   {
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -372,8 +375,9 @@ Problem<equationsType, dim>::assemble_cell_term(FullMatrix<double>& cell_matrix,
     {
         //double div = fe_v_cell[mag].divergence(q);
         //std::cout << " /div:" << div;
-        resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));//setting resistivity
-        equations.compute_flux_matrix(W_prev[q], fluxes_old[q], this->parameters, resistivity);
+        resistivity = (0. * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));//setting resistivity
+        equations.compute_flux_matrix(W_prev[q], fluxes_old[q], this->parameters, resistivity, local_B_grads[q]);
+        //equations.compute_flux_matrix(W_prev[q], fluxes_old[q], this->parameters, resistivity);
     }
 
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -414,7 +418,7 @@ Problem<equationsType, dim>::assemble_cell_term(FullMatrix<double>& cell_matrix,
 template <EquationsType equationsType, int dim>
 void
 Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, const FEFaceValuesBase<dim> &fe_v, const FEFaceValuesBase<dim> &fe_v_neighbor,
-  const bool external_face, const unsigned int boundary_id, Vector<double>& cell_rhs)
+  const bool external_face, const unsigned int boundary_id, Vector<double>& cell_rhs, std::vector<Tensor<2, dim> > local_B_grads)
 {
   // This loop is preparation - calculate all states (Wplus on the current element side of the currently assembled face, Wminus on the other side).
   if (time_step_number == 0)
@@ -476,8 +480,8 @@ Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, cons
       boundary_conditions.bc_vector_value(boundary_id, fe_v.quadrature_point(q), fe_v.normal_vector(q), Wminus_old[q], Wgrad_plus_old[q], Wplus_old[q], this->time, this->cell);
 
     // Once we have the states on both sides of the face, we need to calculate the numerical flux.
-    resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
-    this->numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed, resistivity);
+    resistivity = (0. * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
+    this->numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed, resistivity, local_B_grads[q]);
 
     // Some debugging outputs.
     if ((parameters.debug & parameters.Assembling) || (parameters.debug & parameters.NumFlux))
@@ -521,8 +525,8 @@ Problem<equationsType, dim>::assemble_face_term(const unsigned int face_no, cons
 
         if (std::isnan(val))
         {
-          resistivity = (0.02 * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
-          numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed, resistivity);
+          resistivity = (0. * std::exp(-1.5625 * (fe_v_cell.quadrature_point(q)[0] * fe_v_cell.quadrature_point(q)[0] + fe_v_cell.quadrature_point(q)[1]) * fe_v_cell.quadrature_point(q)[1]));
+          numFlux->numerical_normal_flux(fe_v.normal_vector(q), Wplus_old[q], Wminus_old[q], normal_fluxes_old[q], max_signal_speed, resistivity,local_B_grads[q]);
           LOG(0, ": isnan: " << val);
           LOG(0, ": i: " << i << ", ci: " << (!is_primitive[i] ? 1 : fe_v.get_fe().system_to_component_index(i).first));
           LOG(0, ": point: " << fe_v.quadrature_point(q)[0] << ", " << fe_v.quadrature_point(q)[1] << ", " << fe_v.quadrature_point(q)[2]);
