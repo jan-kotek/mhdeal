@@ -4,7 +4,7 @@
 template <int dim>
 std::vector<std::string> Equations<EquationsTypeMhd, dim>::component_names()
 {
-  return{ "density", "momentum", "momentum", "momentum", "energy", "magnetic_field", "magnetic_field", "magnetic_field" };
+  return{ "density", "momentum", "momentum", "momentum", "energy", "magnetic_field", "magnetic_field", "magnetic_field", "resistivity" };
 }
 
 template <int dim>
