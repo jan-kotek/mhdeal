@@ -13,26 +13,36 @@ void BoundaryConditionSlab<dim>::bc_vector_value(int boundary_no, const Point<di
 	values_vector& result, const grad_vector& grads, const values_vector& values, double time, typename DoFHandler<dim>::active_cell_iterator&) const
 {
 
-	for (unsigned int di = 0; di < Equations<EquationsTypeMhd, dim>::n_components; ++di)
-		result[di] = values[di];
+    for (unsigned int di = 0; di < Equations<EquationsTypeMhd, dim>::n_components; ++di)  
+        result[di] = values[di];
 
+           
+    if (std::abs(normal[1]) < SMALL)
+    {
+        result[1] = 0.;
+        result[2] = 0.;
+        result[3] = 0.;
+        result[5] = 0.;
+        if (point[0] < SMALL) result[6] = -1.;  else result[6] = 1.;
 
+        result[7] = 0.;
+    }
+    else if (point[1] < SMALL)
+    {
+        result[0] = 0.1;
+        result[1] = 0.;
 
-	//if (point[0] < -0.99)
-	//{	result[1] = 10.;
-	//result[2] = 20.;
-	//result[3] = 30.0;
+        result[2] = 1. - point[0] * point[0];
+        result[3] = 0.;
+        
+        result[5] = 0.;
+        result[6] = point[0];
+        result[7] = 0.;
+       // result[4] = 1. - value_list[i][6] * value_list[i][6]; / (this->parameters.gas_gamma - 1.0) + Equations<EquationsTypeMhd, dim >::compute_kinetic_energy(value_list[i]) + Equations<EquationsTypeMhd, dim >::compute_magnetic_energy(value_list[i]);
+       // result[4] = Equations<EquationsTypeMhd, dim>::compute_energy_from_pressure(result, this->cs_parameters.beta, this->parameters);
+    }
 
-	//}
-
-	//if (point[0] > 0.99)
-	//{	result[1] = 0.;
-	//result[2] = 1.;
-	//result[3] = 0.0;
-
-	//}
-	if (boundary_no = 3) result[1] = 10.;
-
+    
 }
 
 template <int dim>
@@ -76,7 +86,7 @@ BoundaryConditionCSFree<dim>::BoundaryConditionCSFree(Parameters<dim>& parameter
 }
 
 template <int dim>
-void BoundaryConditionCSFree<dim>::bc_vector_value(int boundary_no, const Point<dim> &point, const Tensor<1, dim> &normal, 
+void BoundaryConditionCSFree<dim>::bc_vector_value(int boundary_no, const Point<dim> &point, const Tensor<1, dim> &normal,
   values_vector &result, const grad_vector &grads, const values_vector &values, double time, typename DoFHandler<dim>::active_cell_iterator&) const
 {
   for (unsigned int di = 0; di < Equations<EquationsTypeMhd, dim>::n_components; ++di)
@@ -186,8 +196,8 @@ void BoundaryConditionCSInitialState<dim>::bc_vector_value(int boundary_no, cons
   //result[4] = Equations<EquationsTypeMhd, dim>::compute_energy_from_pressure(result, this->cs_parameters.beta, this->parameters);
 }
 
-template class BoundaryConditionSlab<3>;
-template class BoundaryConditionCSWithVortices<3>;
-template class BoundaryConditionCSFree<3>;
-template class BoundaryConditionCSInitialState<3>;
-template class BoundaryConditionCSTest<3>;
+template class BoundaryConditionSlab<2>;
+template class BoundaryConditionCSWithVortices<2>;
+template class BoundaryConditionCSFree<2>;
+template class BoundaryConditionCSInitialState<2>;
+template class BoundaryConditionCSTest<2>;

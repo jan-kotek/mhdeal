@@ -8,7 +8,7 @@
 #include "adaptivityCS.h"
 
 // Dimension of the problem - passed as a template parameter to pretty much every class.
-#define DIMENSION 3
+#define DIMENSION 2
 // Type of equations, must be from the enumeration EquationsType defined in equations.h.
 #define EQUATIONS EquationsTypeMhd
 
@@ -27,13 +27,13 @@ void set_parameters(Parameters<DIMENSION>& parameters, CSParameters& cs_paramete
   //parameters.corner_a = Point<DIMENSION>(-5, -10., 0.);
   //parameters.corner_b = Point<DIMENSION>(5., 10., 0.5);
   //parameters.refinements = { 50, 100 , 1 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
-  parameters.corner_a = Point<DIMENSION>(0., 0., 0.);
-  parameters.corner_b = Point<DIMENSION>(1., 1., 1.);
-  parameters.refinements = { 20, 20 , 20 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
+  parameters.corner_a = Point<DIMENSION>(-1., -10.);
+  parameters.corner_b = Point<DIMENSION>(1., 10.);
+  parameters.refinements = { 1000, 10000 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
 
   parameters.limit = true;
   parameters.limitB = true;
-  parameters.use_div_free_space_for_B = true;
+  parameters.use_div_free_space_for_B = false;
   parameters.num_flux_type = Parameters<DIMENSION>::hlld;
   parameters.lax_friedrich_stabilization_value = 0.5;
   parameters.cfl_coefficient = .01;
@@ -41,12 +41,12 @@ void set_parameters(Parameters<DIMENSION>& parameters, CSParameters& cs_paramete
   parameters.quadrature_order = 1;
   parameters.polynomial_order_dg = 0;  
   parameters.patches = 0;
-  parameters.output_step = 0.0001;
-  parameters.final_time = 1.1;
+  parameters.output_step = 0.05;
+  parameters.final_time = 10.;
   parameters.output_file_prefix = "solution";
 
   parameters.max_cells = 100000;
-  parameters.refine_every_nth_time_step = 2;
+  parameters.refine_every_nth_time_step = 100;
   parameters.perform_n_initial_refinements = 2;//15
   parameters.refine_threshold = 0.5;
   parameters.coarsen_threshold = 0.2;
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     // Set up equations - see equations.h, equationsMhd.h
     Equations<EQUATIONS, DIMENSION> equations;
     // Adaptivity
-    AdaptivityCS<DIMENSION> adaptivity(parameters, mpi_communicator);
+    //AdaptivityCS<DIMENSION> adaptivity(parameters, mpi_communicator);
     // Put together the problem.
     Problem<EQUATIONS, DIMENSION> problem(parameters, equations, triangulation, initial_condition, boundary_conditions);
     // Set adaptivity

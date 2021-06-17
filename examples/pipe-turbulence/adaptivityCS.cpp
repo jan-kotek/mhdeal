@@ -118,10 +118,10 @@ void AdaptivityCS<dim>::calculate_jumps(TrilinosWrappers::MPI::Vector& solution,
 
               for (unsigned int q = 0; q < n_quadrature_points_face; ++q)
               {
-                std::array<double, dim> curl_ = { u_mag[q][2][1] - u_mag[q][1][2], u_mag[q][0][2] - u_mag[q][2][0], u_mag[q][1][0] - u_mag[q][0][1] };
+                std::array<double, 3> curl_ = { u_mag[q][2][1] - u_mag[q][1][2], u_mag[q][0][2] - u_mag[q][2][0], u_mag[q][1][0] - u_mag[q][0][1] };
                 u[q] = curl_[0] * curl_[0] + curl_[1] * curl_[1] + curl_[2] * curl_[2];
 
-                std::array<double, dim> curl_neighbor_ = { u_neighbor_mag[q][2][1] - u_neighbor_mag[q][1][2], u_neighbor_mag[q][0][2] - u_neighbor_mag[q][2][0], u_neighbor_mag[q][1][0] - u_neighbor_mag[q][0][1] };
+                std::array<double, 3> curl_neighbor_ = { u_neighbor_mag[q][2][1] - u_neighbor_mag[q][1][2], u_neighbor_mag[q][0][2] - u_neighbor_mag[q][2][0], u_neighbor_mag[q][1][0] - u_neighbor_mag[q][0][1] };
                 u_neighbor[q] = curl_neighbor_[0] * curl_neighbor_[0] + curl_neighbor_[1] * curl_neighbor_[1] + curl_neighbor_[2] * curl_neighbor_[2];
 
                 jump[face_no / 2] += std::fabs(u[q] - u_neighbor[q]) * JxW[q];
@@ -190,10 +190,10 @@ void AdaptivityCS<dim>::calculate_jumps(TrilinosWrappers::MPI::Vector& solution,
 
               for (unsigned int q = 0; q < n_quadrature_points_face; ++q)
               {
-                std::array<double, dim> curl_ = { u_mag[q][2][1] - u_mag[q][1][2], u_mag[q][0][2] - u_mag[q][2][0], u_mag[q][1][0] - u_mag[q][0][1] };
+                std::array<double, 3> curl_ = { u_mag[q][2][1] - u_mag[q][1][2], u_mag[q][0][2] - u_mag[q][2][0], u_mag[q][1][0] - u_mag[q][0][1] };
                 u[q] = curl_[0] * curl_[0] + curl_[1] * curl_[1] + curl_[2] * curl_[2];
 
-                std::array<double, dim> curl_neighbor_ = { u_neighbor_mag[q][2][1] - u_neighbor_mag[q][1][2], u_neighbor_mag[q][0][2] - u_neighbor_mag[q][2][0], u_neighbor_mag[q][1][0] - u_neighbor_mag[q][0][1] };
+                std::array<double, 3> curl_neighbor_ = { u_neighbor_mag[q][2][1] - u_neighbor_mag[q][1][2], u_neighbor_mag[q][0][2] - u_neighbor_mag[q][2][0], u_neighbor_mag[q][1][0] - u_neighbor_mag[q][0][1] };
                 u_neighbor[q] = curl_neighbor_[0] * curl_neighbor_[0] + curl_neighbor_[1] * curl_neighbor_[1] + curl_neighbor_[2] * curl_neighbor_[2];
 
                 jump[face_no / 2] += std::fabs(u[q] - u_neighbor[q]) * JxW[q];
@@ -266,10 +266,10 @@ void AdaptivityCS<dim>::calculate_jumps(TrilinosWrappers::MPI::Vector& solution,
 
               for (unsigned int q = 0; q < n_quadrature_points_face; ++q)
               {
-                std::array<double, dim> curl_ = { u_mag[q][2][1] - u_mag[q][1][2], u_mag[q][0][2] - u_mag[q][2][0], u_mag[q][1][0] - u_mag[q][0][1] };
+                std::array<double, 3> curl_ = { u_mag[q][2][1] - u_mag[q][1][2], u_mag[q][0][2] - u_mag[q][2][0], u_mag[q][1][0] - u_mag[q][0][1] };
                 u[q] = curl_[0] * curl_[0] + curl_[1] * curl_[1] + curl_[2] * curl_[2];
 
-                std::array<double, dim> curl_neighbor_ = { u_neighbor_mag[q][2][1] - u_neighbor_mag[q][1][2], u_neighbor_mag[q][0][2] - u_neighbor_mag[q][2][0], u_neighbor_mag[q][1][0] - u_neighbor_mag[q][0][1] };
+                std::array<double, 3> curl_neighbor_ = { u_neighbor_mag[q][2][1] - u_neighbor_mag[q][1][2], u_neighbor_mag[q][0][2] - u_neighbor_mag[q][2][0], u_neighbor_mag[q][1][0] - u_neighbor_mag[q][0][1] };
                 u_neighbor[q] = curl_neighbor_[0] * curl_neighbor_[0] + curl_neighbor_[1] * curl_neighbor_[1] + curl_neighbor_[2] * curl_neighbor_[2];
 
                 jump[face_no / 2] += std::fabs(u[q] - u_neighbor[q]) * JxW[q];
@@ -319,4 +319,4 @@ bool AdaptivityCS<dim>::refine_mesh(int time_step, double time, TrilinosWrappers
   return true;
 }
 
-template class AdaptivityCS<3>;
+template class AdaptivityCS<2>;
