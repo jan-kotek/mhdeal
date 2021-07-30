@@ -14,10 +14,21 @@
 
 #ifdef HAVE_MPI
 void set_triangulation(parallel::distributed::Triangulation<DIMENSION>& triangulation, Parameters<DIMENSION>& parameters)
+{
+   // parallel::distributed::Triangulation<DIMENSION> tria1;
+    //parallel::distributed::Triangulation<DIMENSION> tria2;
 #else
 void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMENSION>& parameters)
-#endif
 {
+    //Triangulation<DIMENSION> tria1;
+    //Triangulation<DIMENSION> tria2;
+
+#endif
+
+
+  /*GridGenerator::subdivided_hyper_rectangle(tria1, { 20 100 }, Point<DIMENSION>(-1., -10.), Point<DIMENSION>(1., -9.75), true);
+  GridGenerator::subdivided_hyper_rectangle(tria2, {20,100}, Point<DIMENSION>(-1., -9.99), Point<DIMENSION>(1., 0.01), true);
+  GridGenerator::merge_triangulations(tria1, tria2, triangulation);*/
   GridGenerator::subdivided_hyper_rectangle(triangulation, parameters.refinements, parameters.corner_a, parameters.corner_b, true);
 }
 
@@ -25,33 +36,32 @@ void set_parameters(Parameters<DIMENSION>& parameters, CSParameters& cs_paramete
 {
   parameters.slope_limiter = parameters.vertexBased;
   //parameters.corner_a = Point<DIMENSION>(-5, -10., 0.);
-  //parameters.corner_b = Point<DIMENSION>(5., 10., 0.5);
+  //parameters.corner_b = Point<DIMENSION>(5., 10., 0.1);
   //parameters.refinements = { 50, 100 , 1 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
-  parameters.corner_a = Point<DIMENSION>(-1., -10.);
-  parameters.corner_b = Point<DIMENSION>(1., 10.);
-  parameters.refinements = { 1000, 10000 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
-
+  parameters.corner_a = Point<DIMENSION>(-1.1, -10.);
+  parameters.corner_b = Point<DIMENSION>(1.1, -8);
+  parameters.refinements = { 500, 1000 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
   parameters.limit = true;
   parameters.limitB = true;
   parameters.use_div_free_space_for_B = false;
-  parameters.num_flux_type = Parameters<DIMENSION>::hlld;
+  parameters.num_flux_type = Parameters<DIMENSION>::lax_friedrich;
   parameters.lax_friedrich_stabilization_value = 0.5;
   parameters.cfl_coefficient = .01;
-  parameters.start_limiting_at = -1e-6;//e-6
+  parameters.start_limiting_at = -1e-6;//e-6pokus
   parameters.quadrature_order = 1;
-  parameters.polynomial_order_dg = 0;  
+  parameters.polynomial_order_dg =0 ;  
   parameters.patches = 0;
   parameters.output_step = 0.05;
-  parameters.final_time = 10.;
+  parameters.final_time = 0.0004;
   parameters.output_file_prefix = "solution";
 
-  parameters.max_cells = 100000;
-  parameters.refine_every_nth_time_step = 100;
-  parameters.perform_n_initial_refinements = 2;//15
-  parameters.refine_threshold = 0.5;
-  parameters.coarsen_threshold = 0.2;
+  parameters.max_cells = 1000000;
+  parameters.refine_every_nth_time_step = 10;
+  parameters.perform_n_initial_refinements = 7;//15
+  parameters.refine_threshold = 0.01;
+  parameters.coarsen_threshold = 0.005;
   parameters.volume_factor = 4;
-  parameters.time_interval_max_cells_multiplicator = 0.;
+  parameters.time_interval_max_cells_multiplicator = 10.;
   parameters.gas_gamma = 1.25;
   // plasma beta
   cs_parameters.beta = 0.10;
@@ -129,7 +139,7 @@ int main(int argc, char *argv[])
     // Put together the problem.
     Problem<EQUATIONS, DIMENSION> problem(parameters, equations, triangulation, initial_condition, boundary_conditions);
     // Set adaptivity
-    // problem.set_adaptivity(&adaptivity);
+    //problem.set_adaptivity(&adaptivity);
     // Run the problem - entire transient problem.
     problem.run();
   }
