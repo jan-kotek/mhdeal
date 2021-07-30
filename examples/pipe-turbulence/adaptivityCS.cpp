@@ -13,8 +13,8 @@ template <int dim>
 void AdaptivityCS<dim>::calculate_jumps(TrilinosWrappers::MPI::Vector& solution, const DoFHandler<dim>& dof_handler, const Mapping<dim>& mapping, Vector<double>& gradient_indicator)
 {
   FEValuesExtractors::Scalar scalars[dim];
-  scalars[0].component = 0;
-  scalars[1].component = 4;
+  scalars[0].component = 0;//density
+  scalars[1].component = 4;//energy_tot
 
   const QGauss<dim - 1> face_quadrature(1);
   UpdateFlags face_update_flags = UpdateFlags(update_values | update_JxW_values | update_gradients);

@@ -27,12 +27,12 @@ void BoundaryConditionSlab<dim>::bc_vector_value(int boundary_no, const Point<di
 
         result[7] = 0.;
     }
-    else if (point[1] < SMALL)
+    else if (point[1] < -9.5)
     {
         result[0] = 0.1;
         result[1] = 0.;
 
-        result[2] = 1. - point[0] * point[0];
+        if (abs(point[0]) < 1.) result[2] = 0.8*(1. - point[0] * point[0]); else result[2] = 0.;//amplituda prepsat do parametru
         result[3] = 0.;
         
         result[5] = 0.;

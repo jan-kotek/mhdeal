@@ -28,7 +28,7 @@ void set_parameters(Parameters<DIMENSION>& parameters)
   parameters.slope_limiter = parameters.vertexBased;
   parameters.corner_a = Point<DIMENSION>(0., 0.);
   parameters.corner_b = Point<DIMENSION>(1., 1.);
-  parameters.refinements = { 100, 100};
+  parameters.refinements = { 1000, 1000};
   parameters.limit = false;
   parameters.use_div_free_space_for_B = false;
   parameters.periodic_boundaries = { { 0, 1, 0} };
@@ -39,8 +39,8 @@ void set_parameters(Parameters<DIMENSION>& parameters)
   parameters.quadrature_order = 1;
   parameters.polynomial_order_dg = 1;
   parameters.patches = 0;
-  parameters.output_step = 2.e-2;
-  parameters.final_time = .5;
+  parameters.output_step = .02;
+  parameters.final_time = .01;
   //parameters.debug =  parameters.BasicSteps;// | parameters.PeriodicBoundaries | parameters.Assembling;
 }
 

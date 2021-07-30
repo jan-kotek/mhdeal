@@ -36,6 +36,7 @@ void InitialConditionCS<equationsType, dim>::vector_value(const std::vector<Poin
 
 		value_list[i][1] = 0.;
 		value_list[i][2] = 0;// 1. - p[0] * p[0];
+		if (p[1] < -9.95) value_list[i][2] = 2.*   (1. - p[0] * p[0]);
 		value_list[i][3] = 0.;
 
 		

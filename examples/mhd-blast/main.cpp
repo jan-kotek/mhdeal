@@ -39,7 +39,7 @@ void set_parameters(Parameters<DIMENSION>& parameters)
     parameters.num_flux_type = Parameters<DIMENSION>::lax_friedrich;
     parameters.lax_friedrich_stabilization_value = 0.5;
     parameters.cfl_coefficient = .05;
-    parameters.quadrature_order = 5;
+    parameters.quadrature_order = 2;
     parameters.polynomial_order_dg = 1;
     parameters.patches = 0;
     parameters.output_step = 1.e-3;
