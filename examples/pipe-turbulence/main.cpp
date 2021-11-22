@@ -49,7 +49,7 @@ void set_parameters(Parameters<DIMENSION>& parameters, CSParameters& cs_paramete
   parameters.cfl_coefficient = .1;
   parameters.start_limiting_at = -1e-6;//e-6pokus
   parameters.quadrature_order = 1;
-  parameters.polynomial_order_dg =1;  
+  parameters.polynomial_order_dg = 0;  
   parameters.patches = 0;
   parameters.output_step = 0.05;
   parameters.final_time = 0.0004;
