@@ -1,7 +1,7 @@
 #include "completeEllipticIntegrals.h"
 #include "initialConditionTD.h"
 #include "equationsMhd.h"
-
+extern std::vector<std::vector<std::string>> inputvector;
 template <EquationsType equationsType, int dim>
 InitialConditionTitovDemoulin<equationsType, dim>::InitialConditionTitovDemoulin(Parameters<dim>& parameters, TitovDemoulinParameters& td_parameters) :
   InitialCondition<equationsType, dim>(parameters), td_parameters(td_parameters)
@@ -33,12 +33,14 @@ template <EquationsType equationsType, int dim>
 void InitialConditionTitovDemoulin<equationsType, dim>::vector_value(const std::vector<Point<dim> > &points, std::vector<std::array<double, Equations<equationsType, dim>::n_components> >& value_list) const
 {
   //========== Calculate the vector potential for I_t-generated toroidal field 
+  
   double xx, yy, zz;
   Point<dim> &ca = this->parameters.corner_a;
   Point<dim> &cb = this->parameters.corner_b;
   const double dd = SMALL;  // precision of numerical derivatives
   const double idd = 0.5 / dd;
-
+  std::cout << inputvector[1][1]<<" ";
+  
   for (unsigned int pp = 0; pp < points.size(); ++pp)
   {
     const Point<dim>& p = points[pp];

@@ -2,10 +2,10 @@
 #include "problem.h"
 #include "equationsMhd.h"
 #include "parameters.h"
-#include "parametersCS.h"
-#include "initialConditionCS.h"
-#include "boundaryConditionCS.h"
-#include "adaptivityCS.h"
+#include "parametersSS.h"
+#include "initialConditionSS.h"
+#include "boundaryConditionSS.h"
+#include "adaptivitySS.h"
 
 // Dimension of the problem - passed as a template parameter to pretty much every class.
 #define DIMENSION 3
@@ -21,24 +21,26 @@ void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMEN
   GridGenerator::subdivided_hyper_rectangle(triangulation, parameters.refinements, parameters.corner_a, parameters.corner_b, true);
 }
 
-void set_parameters(Parameters<DIMENSION>& parameters, CSParameters& cs_parameters)
+std::vector<std::vector<std::string>> inputvector; //input skvrna
+
+void set_parameters(Parameters<DIMENSION>& parameters, SSParameters& cs_parameters)
 {
   parameters.slope_limiter = parameters.vertexBased;
-  parameters.corner_a = Point<DIMENSION>(-10, -30., 0.);
-  parameters.corner_b = Point<DIMENSION>(10., 30., 0.5);
-  parameters.refinements = { 250, 500 , 1 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
-  parameters.limit = true;
-  parameters.limitB = true;
+  parameters.corner_a = Point<DIMENSION>(0., 0., 0.);
+  parameters.corner_b = Point<DIMENSION>(1., 1., 2.);
+  parameters.refinements = { 100, 100 , 200 };//ok je na oase napr. 300:9000-15cpu na nod pri 8 st. vol. na nod.
+  parameters.limit = false;
+  parameters.limitB = false;
   parameters.use_div_free_space_for_B = false;
   parameters.num_flux_type = Parameters<DIMENSION>::hlld;
   parameters.lax_friedrich_stabilization_value = 0.5;
   parameters.cfl_coefficient = .01;
   parameters.start_limiting_at = -1e-6;//e-6
-  parameters.quadrature_order = 5;
-  parameters.polynomial_order_dg = 1;
+  parameters.quadrature_order = 1;
+  parameters.polynomial_order_dg = 0;
   parameters.patches = 0;
   parameters.output_step = 1.;
-  parameters.final_time = 200.;
+  parameters.final_time = 0.0001;
   parameters.output_file_prefix = "solution";
 
   parameters.max_cells = 100000;
@@ -99,10 +101,30 @@ int main(int argc, char *argv[])
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
 
   try
-  {
+  { 
+    //input skvrna
+      std::vector<std::string> row;
+      std::string line, word;
+
+      std::fstream input("/r/2D.csv", std::ios::in);
+      if (input.is_open())
+      {
+          while (getline(input, line))
+          {
+              row.clear();
+              std::stringstream str(line);
+              while (getline(str, word, ';'))
+                  row.push_back(word);
+              inputvector.push_back(row);
+          }
+      }
+      else std::cout << "Could not open input file";
+
+
+
     // Initialization of parameters. See parameters.h for description of the individual parameters
     Parameters<DIMENSION> parameters;
-    CSParameters cs_parameters;
+    SSParameters cs_parameters;
     set_parameters(parameters, cs_parameters);
     parameters.delete_old_outputs(mpi_communicator);
 
@@ -114,13 +136,13 @@ int main(int argc, char *argv[])
 #endif    
     set_triangulation(triangulation, parameters);
 
-    InitialConditionCS<EQUATIONS, DIMENSION> initial_condition(parameters, cs_parameters);
+    InitialConditionSS<EQUATIONS, DIMENSION> initial_condition(parameters, cs_parameters);
     // Set up of boundary condition. See boundaryCondition.h for description of methods, set up the specific function in boundaryCondition.cpp
-    BoundaryConditionCSFree<DIMENSION> boundary_conditions(parameters, cs_parameters);
+    BoundaryConditionSSFree<DIMENSION> boundary_conditions(parameters, cs_parameters);
     // Set up equations - see equations.h, equationsMhd.h
     Equations<EQUATIONS, DIMENSION> equations;
     // Adaptivity
-    AdaptivityCS<DIMENSION> adaptivity(parameters, mpi_communicator);
+    AdaptivitySS<DIMENSION> adaptivity(parameters, mpi_communicator);
     // Put together the problem.
     Problem<EQUATIONS, DIMENSION> problem(parameters, equations, triangulation, initial_condition, boundary_conditions);
     // Set adaptivity

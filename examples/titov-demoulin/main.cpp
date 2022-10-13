@@ -7,6 +7,7 @@
 #include "boundaryConditionTD.h"
 #include "adaptivityTD.h"
 
+
 // Dimension of the problem - passed as a template parameter to pretty much every class.
 #define DIMENSION 3
 // Type of equations, must be from the enumeration EquationsType defined in equations.h.
@@ -20,13 +21,13 @@ void set_triangulation(Triangulation<DIMENSION>& triangulation, Parameters<DIMEN
 {
   GridGenerator::subdivided_hyper_rectangle(triangulation, parameters.refinements, parameters.corner_a, parameters.corner_b, true);
 }
-
+std::vector<std::vector<std::string>> inputvector;
 void set_parameters(Parameters<DIMENSION>& parameters, TitovDemoulinParameters& td_parameters)
 {
   parameters.slope_limiter = parameters.vertexBased;
   parameters.corner_a = Point<DIMENSION>(-5., -10., 0.);
   parameters.corner_b = Point<DIMENSION>(5., 10., 10.);
-  parameters.refinements = { 60, 120, 60 };
+  parameters.refinements = { 3, 6, 3 };//60 120 60
   parameters.limit = false;
   parameters.limitB = false;
   parameters.use_div_free_space_for_B = false;
@@ -38,12 +39,12 @@ void set_parameters(Parameters<DIMENSION>& parameters, TitovDemoulinParameters& 
   parameters.polynomial_order_dg = 1;
   parameters.patches = 0;
   parameters.output_step = 5.e-1;
-  parameters.final_time = 12.;
+  parameters.final_time = 0.1;//12.
   parameters.output_file_prefix = "vtx_limit";
 
   parameters.max_cells = 2500;
   parameters.refine_every_nth_time_step = 25;
-  parameters.perform_n_initial_refinements = 25;
+  parameters.perform_n_initial_refinements = 0;//25
   parameters.refine_threshold = 0.5;
   parameters.coarsen_threshold = 0.2;
   parameters.volume_factor = 4;
@@ -92,20 +93,39 @@ void set_parameters(Parameters<DIMENSION>& parameters, TitovDemoulinParameters& 
 
   td_parameters.t_ramp = 1.0;
 }
-
+ 
+ 
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, dealii::numbers::invalid_unsigned_int);
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
 
   try
-  {
+  {  
+      
+      std::vector<std::string> row;
+      std::string line, word;
+
+      std::fstream input("/r/2D.csv", std::ios::in);
+          if (input.is_open())
+          {
+              while (getline(input, line))
+              {
+                  row.clear();
+                  std::stringstream str(line);
+                  while (getline(str, word, ';'))
+                      row.push_back(word);
+                  inputvector.push_back(row);
+              }
+          }
+          else std::cout << "Could not open input file";
+
     // Initialization of parameters. See parameters.h for description of the individual parameters
     Parameters<DIMENSION> parameters;
     TitovDemoulinParameters td_parameters;
     set_parameters(parameters, td_parameters);
     parameters.delete_old_outputs(mpi_communicator);
-
+    
     // Declaration of triangulation. The triangulation is not initialized here, but rather in the constructor of Parameters class.
 #ifdef HAVE_MPI
     parallel::distributed::Triangulation<DIMENSION> triangulation(mpi_communicator, typename dealii::Triangulation<DIMENSION>::MeshSmoothing(Triangulation<DIMENSION>::limit_level_difference_at_vertices));
@@ -113,6 +133,8 @@ int main(int argc, char *argv[])
     Triangulation<DIMENSION> triangulation(Triangulation<DIMENSION>::limit_level_difference_at_vertices);
 #endif    
     set_triangulation(triangulation, parameters);
+
+
 
     InitialConditionTitovDemoulin<EQUATIONS, DIMENSION> initial_condition(parameters, td_parameters);
     // Set up of boundary condition. See boundaryCondition.h for description of methods, set up the specific function in boundaryCondition.cpp

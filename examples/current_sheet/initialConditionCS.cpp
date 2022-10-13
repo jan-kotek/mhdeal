@@ -19,6 +19,8 @@ void InitialConditionCS<equationsType, dim>::vector_value(const std::vector<Poin
 	std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
 	std::uniform_int_distribution<> dis(-1, 1);
 
+
+	/*random
 	for (unsigned int i = 0; i < points.size(); ++i)
 	{
 		const Point<dim>& p = points[i];
@@ -38,6 +40,33 @@ void InitialConditionCS<equationsType, dim>::vector_value(const std::vector<Poin
 		value_list[i][3] = 0.;
 
 			
+
+
+		value_list[i][5] = 0.0; //magnetic field
+		value_list[i][6] = std::tanh(p[0]);
+		value_list[i][7] = 0.;
+
+	}
+	*/
+	
+	//start outflow
+	for (unsigned int i = 0; i < points.size(); ++i)
+	{
+		const Point<dim>& p = points[i];
+		value_list[i][0] = 1.; //density
+
+		value_list[i][1] = 0.; //momentum density
+		value_list[i][2] = 0.;
+		value_list[i][3] = 0.;
+
+		if (((abs(points[i][0]) < (cb[0] - 0.5)) and (abs(points[i][1]) < (cb[1] - 1.))))
+		{
+			value_list[i][1] = 0.;
+			value_list[i][2] = 0.08 * (0 < points[i][1]) - (points[i][1] < 0);
+		}
+		value_list[i][3] = 0.;
+
+
 
 
 		value_list[i][5] = 0.0; //magnetic field

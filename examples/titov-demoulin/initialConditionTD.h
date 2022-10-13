@@ -6,6 +6,13 @@
 #include "initialCondition.h"
 #include "equations.h"
 #include "parametersTD.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <sstream>
+
+
 
 template <EquationsType equationsType, int dim>
 class InitialConditionTitovDemoulin : public InitialCondition<equationsType, dim>
