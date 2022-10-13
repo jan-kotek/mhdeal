@@ -16,3 +16,4 @@ Contributors:
 - Jan Kotek <jankotek@email.cz>
 - Lukas Korous <lukas.korous@gmail.com>
 
+[![DOI](https://zenodo.org/badge/336401602.svg)](https://zenodo.org/badge/latestdoi/336401602)
